@@ -1,2 +1,5 @@
-# CodeGenX-1
-AI Auto completion Extension for VSCode made with GTP-J.
+# CodeGenX
+
+<p align="center">
+  <img src="logo.png" height=200 />
+<p/>
