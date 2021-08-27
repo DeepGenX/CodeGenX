@@ -89,6 +89,8 @@ export function activate(context: vscode.ExtensionContext) {
 			if (output==null){
 			var out = await getOutput(input.trim());
 			out = out.trim();
+
+			// Choose the appropriate comment symbol:
 			const comment = comment_symbols[0];
 			for (const symbol in comment_symbols) {
 				if (out.includes(symbol)) {
