@@ -49,7 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const files = ['c','cpp','csharp','java','javascript', 'php', 'python', 'SQL', 'HTML'];
 
 	// Mapping of file extensions to comments:
-	const comment_map = Object({'py':['#'], 'cpp':["//","*/"], "cs":["//","*/"], "java":["//","*/"], "js":["//","*/"], "php":["//","*/", '#'], 'sql':["--","*/"], "html":["-->"], "htm":["-->"]});
+	const comment_map = Object({'py':'#', 'cpp':"//", "cs":"//", "java":"//", "js":"//", 'sql':"//", "html":["-->"], "htm":["-->"]});
 
 	const provider1 = vscode.languages.registerCompletionItemProvider(files, {
 
@@ -66,7 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 			const filename = editor.document.uri.fsPath;
 			const extension = 	filename.split('.').slice(-1)[0];
-			const comment_symbols = comment_map[extension];
+			const comment = comment_map[extension];
 
 			// Going through the blocks of text in out_lst:
 			for (let index = 0; index < out_lst.length; index++) {
@@ -91,14 +91,6 @@ export function activate(context: vscode.ExtensionContext) {
 			out = out.trim();
 
 			// Choose the appropriate comment symbol:
-			const comment = comment_symbols[0];
-			for (const symbol in comment_symbols) {
-				if (out.includes(symbol)) {
-					const comment = symbol;
-					break;
-				}
-			}
-
 			out_lst = break_string(out,comment);
 			output = out_lst[0];
 
