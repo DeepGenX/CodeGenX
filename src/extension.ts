@@ -48,6 +48,9 @@ export function activate(context: vscode.ExtensionContext) {
 	// (see https://code.visualstudio.com/docs/languages/identifiers#_known-language-identifiers):
 	const files = ['c','cpp','csharp','java','javascript', 'php', 'python', 'SQL', 'HTML'];
 
+	// Mapping of file extensions to comments:
+	const comment_map = Object({'py':['#'], 'cpp':["//","*/"], "cs":["//","*/"], "java":["//","*/"], "js":["//","*/"], "php":["//","*/", '#'], 'sql':["--","*/"], "html":["-->"], "htm":["-->"]});
+
 	const provider1 = vscode.languages.registerCompletionItemProvider(files, {
 
 		async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext) {
@@ -58,9 +61,12 @@ export function activate(context: vscode.ExtensionContext) {
 			// Getting text before cursor:
 			var cursorPosition = editor.selection.active;
 			var input = editor.document.getText(new vscode.Range(0, 0, cursorPosition.line, cursorPosition.character));
-
+			
 			var output = null;
-			const comment = '#';
+
+			const filename = editor.document.uri.fsPath;
+			const extension = 	filename.split('.').slice(-1)[0];
+			const comment_symbols = comment_map[extension];
 
 			// Going through the blocks of text in out_lst:
 			for (let index = 0; index < out_lst.length; index++) {
@@ -83,6 +89,13 @@ export function activate(context: vscode.ExtensionContext) {
 			if (output==null){
 			var out = await getOutput(input.trim());
 			out = out.trim();
+			const comment = comment_symbols[0];
+			for (const symbol in comment_symbols) {
+				if (out.includes(symbol)) {
+					const comment = symbol;
+					break;
+				}
+			}
 
 			out_lst = break_string(out,comment);
 			output = out_lst[0];
