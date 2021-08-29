@@ -4,13 +4,21 @@
 	"version": "0.1.0",
 	"publisher": "DeepGenX",
 	"private": false,
+	"license": "See LICENSE",
+	"homepage": "https://github.com/DeepGenX/CodeGenX",
+	"bugs": {
+		"url": "https://github.com/DeepGenX/CodeGenX/issues",
+		"email": "aryagm01@gmail.com"
+	  },
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/DeepGenX/CodeGenX"
+		
 	},
+	"icon": "src/final_logo.ico",
 	"preview": true,
 	"engines": {
-		"vscode": "^1.32.0"
+		"vscode": "^1.32.0"	
 	},
 	"categories": [
 		"Snippets",
