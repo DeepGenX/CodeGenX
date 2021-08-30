@@ -1,0 +1,7 @@
+{
+    "default_parameters": {
+        "max_length": 700,
+        "temperature": 1.22,
+        "top_p": 0.94
+    }
+}

@@ -2,13 +2,14 @@
 
 import requests
 
-def get_output(context: str, max_length: int = 1024, temp: float = 1.2, top_p: float = 0.7):
+# When editing this function, make sure not to change the parameters unless it is really needed
+def get_output(context: str, max_length: int, temperature: float, top_p: float):
     "Send a request to the api to generate a response for the given context."
 
     payload = {
         "context": context,
         "token_max_length": max_length,
-        "temperature": temp,
+        "temperature": temperature,
         "top_p": top_p,
     }
 

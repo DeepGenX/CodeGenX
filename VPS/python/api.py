@@ -1,24 +1,47 @@
-#!/bin/python3
-
-from flask import Flask, request
-from gpt_output import get_output
-from text_processing import process_blocks, process_output, process_input, count_leading_spaces, COMMENTS
-import requests
-import json
+from gpt_output import *
+from text_processing *
+from logger import Logger, Level
 from typing import *
 
-app = Flask(__name__)
+from fastapi import FastAPI
+import json
 
-def get_ip() -> str:
-    "Returns the server ip."
+app = FastAPI()
+logger = Logger()
 
-    return requests.get("http://icanhazip.com/").text.strip()
+logger.log(Level.INFO, "Hey wasup")
 
-@app.route("/", methods=["POST"])
-def main() -> str:
-    blocks = process_blocks(process_output(request.form.get("input"), get_output(process_input(request.form.get("input"), request.form.get("language"))), request.form.get("language")), count_leading_spaces(request.form.get("input").splitlines()[-1]), COMMENTS[request.form.get("language")]) # Get the output for the processed input
+config = {}
+def update_config() -> None:
+    global config
 
-    return json.dumps({blocks}) # Return the array of blocks as a json string
+    while True:
+        try:
+            with open("config.json", "r") as f:
+                new = json.load(f)
+                if config != new:
+                    config = new
+            
+            time.sleep(1)
+        except:
+            logger.log(logger.WARNING, "Failed to read config file")
 
-if __name__ == "__main__":
-    app.run(get_ip(), port=5781)
+            time.sleep(5
+        
+# Starting a thread to update the config when it changes
+thread = threading.Thread(target=update_config)
+
+@app.post("/generate")
+async def generate(context: str, max_length: Optional[int] = None, temperature: Optional[float] = 1.22, top_p: Optional[float] = 0.94) -> str:
+    # Validating the parameters and setting them to default values if they're empty
+    parameters = {
+        "max_length": max_length,
+        "temperature": temperature,
+        "top_p": top_p
+    }
+
+    for parameter in parameters:
+        if parameter == None:
+            parameters[parameter] = config["default_parameters"][]
+
+    output = get_output(context, max_length, temperature, top_p)
