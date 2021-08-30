@@ -1,0 +1,10 @@
+{
+    "host": "0.0.0.0",
+    "port": 5700,
+
+    "default_parameters": {
+        "max_length": 128,
+        "temperature": 1.22,
+        "top_p": 0.94
+    }
+}
