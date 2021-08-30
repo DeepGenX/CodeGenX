@@ -12,8 +12,8 @@ The response format is a json string containing these values:
 - error (only present when success is false): When success is false the error value will be set to a json object containing a code and a string giving a basic description of what went wrong
 - output (only present when success is true): When success is true the output value will be set to whatever GPT-J outputted after it has been parsed
 Examples:
-{"success": true, "output": "ofjewoijfweoifjweoifjew"}
-{"success", false, "error": {"code": "LANGUAGE_NOT_SUPPORTED", "message": "Language is not supported."}}
+{"success": true, "output": ["abjiwjiodaoijdw"]}
+{"success", false, "error": {"code": "MISSING_PARAMETER", "message": "Missing input parameter."}}
 
 Errors and their meanings:
 When something goes wrong the error value will be set, here is a list of what every error means:
