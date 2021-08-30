@@ -7,6 +7,7 @@ import requests
 import json
 from typing import *
 
+
 app = Flask(__name__)
 
 def get_ip() -> str:

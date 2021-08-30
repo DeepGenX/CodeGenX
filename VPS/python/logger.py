@@ -1,33 +1,37 @@
 import datetime
 from typing import *
 
+from termcolor import colored
+
+
 class Level:
-    SEVERE = 0
+    ERROR = 0
     WARNING = 1
     INFO = 2
 
+    colors = [
+        "red",
+        "yellow",
+        "green"
+    ]
+
     @staticmethod
     def to_string(level: int) -> str:
-        return [
-            "SEVERE",
-            "WARNING",
-            "INFO"
-        ][level]
+        return [key for key in Level.__dict__][1:][level]
 
 class Logger:
-    def __init__(self, format: Optional[str] = "[{y}-{m}-{d}] [{H}:{M}:{S}]   [{level}] {message}") -> str:
+    def __init__(self, format: Optional[str] = "[{y}-{m}-{d}] [{H}:{M}:{S}]  [{level}]  ") -> str:
         self.format = format
     
     def log(self, level: Level, message: str) -> None:
         now = datetime.datetime.now()
         
-        print(self.format
-        .replace("{y}", now.year)
-        .replace("{m}", now.month)
-        .replace("{d}", now.day)
-        .replace("{H}", now.hour)
-        .replace("{M}", now.minute)
-        .replace("{S}", now.second)
-        .replace("{level}", level)
-        .replace("{message}", message)
-        )
+        print(colored(self.format
+        .replace("{y}", str(now.year).zfill(4))
+        .replace("{m}", str(now.month).zfill(2))
+        .replace("{d}", str(now.day).zfill(2))
+        .replace("{H}", str(now.hour).zfill(2))
+        .replace("{M}", str(now.minute).zfill(2))
+        .replace("{S}", str(now.second).zfill(2))
+        .replace("{level}", Level.to_string(level))
+        , Level.colors[level], attrs=["bold"]) + str(message))

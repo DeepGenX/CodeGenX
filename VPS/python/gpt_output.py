@@ -2,20 +2,18 @@
 
 import requests
 
+
 # When editing this function, make sure not to change the parameters unless it is really needed
-def get_output(context: str, max_length: int, temperature: float, top_p: float):
+def get_output(input: str, max_length: int, temperature: float, top_p: float):
     "Send a request to the api to generate a response for the given context."
 
     payload = {
-        "context": context,
+        "context": input,
         "token_max_length": max_length,
         "temperature": temperature,
         "top_p": top_p,
     }
 
     response = requests.post("http://api.vicgalle.net:5000/generate", params=payload).json()
-
-    with open("raw_output.txt", "w") as f:
-        f.write(response["text"])
 
     return response["text"]
