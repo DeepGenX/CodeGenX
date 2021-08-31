@@ -28,7 +28,7 @@ export function activate(context: vscode.ExtensionContext) {
 			for (var i = start; i < lines.length; i++) {
 				out += lines[i] + "\n";
 				start += 1;
-				if (lines[i].startsWith(comment)) {
+				if (lines[i].trim().startsWith(comment)) {
 					break;
 					
 				}
