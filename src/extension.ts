@@ -77,6 +77,7 @@ export function activate(context: vscode.ExtensionContext) {
 					// Adding newline to output if users cursor is on a line with text:
 					if (editor.document.lineAt(editor.selection.active.line).text == ''){
 					output = out_lst[index+1];
+					output = " "+output;
 					}
 					else {
 					output = '\n'+out_lst[index+1];
@@ -98,6 +99,9 @@ export function activate(context: vscode.ExtensionContext) {
 			if (editor.document.lineAt(editor.selection.active.line).text != ''){
 				output = '\n'+output;
 				}
+			else{
+				output = " "+output;
+			}
 			}
 			
 			// Converting the text into a VScode CompletionItem:
