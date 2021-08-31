@@ -6,6 +6,9 @@
 	"private": false,
 	"license": "SEE LICENSE IN LICENSE",
 	"homepage": "https://github.com/DeepGenX/CodeGenX",
+	"author": {"name": "DeepGenX", "email": "deepgenx@gmail.com", "url": "https://deepgenx.com"},
+	"keywords": ["generation", "code", "copilot", "deepgenx", "autocomplete", "completion"],
+	"qna": "https://github.com/DeepGenX/CodeGenX/discussions/categories/q-a",
 	"bugs": {
 		"url": "https://github.com/DeepGenX/CodeGenX/issues",
 		"email": "deepgenx@gmail.com"
@@ -16,12 +19,11 @@
 		
 	},
 	"icon": "src/final_logo.ico",
-	"preview": true,
+	"preview": false,
 	"engines": {
 		"vscode": "^1.32.0"	
 	},
 	"categories": [
-		"Snippets",
 		"Machine Learning",
 		"Data Science",
 		"Programming Languages"
@@ -29,7 +31,41 @@
 	"activationEvents": [
 		"*"
 	],
-	"contributes": {},
+	"contributes": {
+		"configuration":[
+			{
+				"title": "CodeGenX",
+				"properties": {
+					"Codegenx.Temperature": {
+						"type": "number",
+						"default": 1.0,
+						"description": "The temperature parameter of the GPT-J model"
+					  },
+					  "Codegenx.Top_P": {
+						"type": "number",
+						"default": 0.8,
+						"description": "The top_p parameter of the GPT-J model"
+					  },
+					  "Codegenx.Top_K": {
+						"type": "number",
+						"default": 40,
+						"description": "The top_k parameter of the GPT-J model"
+					  },
+					  "Codegenx.MaxLength": {
+						"type": "number",
+						"default": 512,
+						"description": "The token_max_length parameter of the GPT-J model"
+					  },
+					  "Codegenx.StopSequence": {
+						"type": "string",
+						"default": "<|endoftext|>",
+						"description": "The stop_sequence parameter of the GPT-J model"
+					  }
+					  
+				}
+			}
+		]
+	},
 	"main": "./out/extension.js",
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
