@@ -46,10 +46,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Files supported by CodeGenX 
 	// (see https://code.visualstudio.com/docs/languages/identifiers#_known-language-identifiers):
-	const files = ['c','cpp','csharp','java','javascript', 'php', 'python', 'SQL', 'HTML'];
+	const files = ['c','cpp','csharp','java','javascript', 'php', 'python', 'SQL', 'HTML', 'typescript'];
 
 	// Mapping of file extensions to comments:
-	const comment_map = Object({'py':'#', 'cpp':"//", "cs":"//", "java":"//", "js":"//", 'sql':"//", "html":["-->"], "htm":["-->"]});
+	const comment_map = Object({'py':'#', 'cpp':"//", "cs":"//", "java":"//", "js":"//", 'sql':"//", "html":"-->", "htm":"-->", "ts":'//'});
 
 	const provider1 = vscode.languages.registerCompletionItemProvider(files, {
 
@@ -66,7 +66,18 @@ export function activate(context: vscode.ExtensionContext) {
 
 			const filename = editor.document.uri.fsPath;
 			const extension = 	filename.split('.').slice(-1)[0];
-			const comment = comment_map[extension];
+			var comment = comment_map[extension];
+			
+			if (extension=="py"){
+				var temp_input = input.trim();
+				var last_line = temp_input.split(/\r?\n/).slice(-1)[0].trim();
+				if (last_line.startsWith('"""')){
+					comment = '"""';
+				}
+				else if (last_line.startsWith("'''")){
+					comment = "'''";
+				}}
+			
 
 			// Going through the blocks of text in out_lst:
 			for (let index = 0; index < out_lst.length; index++) {
@@ -86,7 +97,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 			}
 
-			// If the output if null then run the model again:
+			// If the output is null then run the model again:
 			if (output==null){
 			var out = await getOutput(input.trim());
 			out = out.trim();
