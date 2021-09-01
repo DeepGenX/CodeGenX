@@ -20,16 +20,20 @@ export function activate(context: vscode.ExtensionContext) {
 	// Function that breaks output text into blocks:
 	function break_string(text:string, comment:string) {
 		const blocks = [];
-	
+		
 		while (blocks.join().trim().length < text.trim().length) {
 			var out = "";
 			const lines = text.split(/\r?\n/);
 			for (var i = 0; i < lines.length; i++) {
-				if (comment=="\"\"\"" || comment=="'''"){
+
+				// Special case for python docstrings and "*/"
+				if (comment=="\"\"\"" || comment=="'''" || comment=="*/"){
 					out += lines[i] + "\n";
 				if (lines[i].trim().endsWith(comment)) {
 					break;}
 				}
+
+				// Standard comments
 				else{
 					out += lines[i] + "\n";
 				if (lines[i].trim().startsWith(comment)) {
@@ -45,7 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const files = ['c','cpp','csharp','java','javascript', 'php', 'python', 'SQL', 'HTML', 'typescript'];
 
 	// Mapping of file extensions to comments:
-	const comment_map = Object({'py':'#', 'cpp':"//", "cs":"//", "java":"//", "js":"//", 'sql':"//", "html":"-->", "htm":"-->", "ts":'//'});
+	const comment_map = Object({ 'py': '#', 'cpp': "//", "c": "//", "cs": "//", "java": "//", "js": "//", 'sql': "//", "html": "-->", "htm": "-->", "ts": '//', "i": '//' });
 
 	const provider1 = vscode.languages.registerCompletionItemProvider(files, {
 
@@ -83,6 +87,13 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 				else if (last_line.endsWith("'''")){
 					comment = "'''";
+				}}
+			
+			if (extension=="ts" || extension=="js"||extension=="cpp" || extension=="cs" || extension=="java" || extension=="sql"||extension=="c"||extension=="i"){
+				var temp_input = input.trim();
+				var last_line = temp_input.split(/\r?\n/).slice(-1)[0].trim();
+				if (last_line.endsWith("*/")){
+					comment = "*/";
 				}}
 			
 
