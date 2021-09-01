@@ -129,7 +129,7 @@ export function activate(context: vscode.ExtensionContext) {
 				output = '\n'+output;
 				}
 			else{
-				output = " "+output;
+				output = "\n"+output;
 			}
 			}
 			
