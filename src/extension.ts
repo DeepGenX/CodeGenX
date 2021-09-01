@@ -106,7 +106,7 @@ export function activate(context: vscode.ExtensionContext) {
 					// Adding newline to output if users cursor is on a line with text:
 					if (editor.document.lineAt(editor.selection.active.line).text == ''){
 					output = out_lst[index+1];
-					output = " "+output;
+					output = "\n"+output;
 					}
 					else {
 					output = '\n'+out_lst[index+1];
