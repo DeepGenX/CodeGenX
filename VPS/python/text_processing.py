@@ -128,3 +128,19 @@ def process_blocks(blocks: List[str], start_indent: int, comment: str) -> List[s
         processed_blocks.append(processed_block)
     
     return processed_blocks
+
+def score_code(code: str, comment: str) -> int:
+    "Gives a piece of code a score."
+
+    COMMENT_SCORE = 10
+    LINE_PENALTY = 8.5
+
+    score = 0
+
+    for line in code.splitlines():
+        if line.strip().startswith(comment): # TODO: Make this function check if the line includes a comment (not just if it starts with one, also remove strings so we don't read comment symbols in strings)
+            score += COMMENT_SCORE
+    
+    score -= len(code.splitlines()) * LINE_PENALTY
+
+    return score

@@ -45,6 +45,19 @@ def create_response(success: bool, error_or_output: Union[str, dict]) -> dict:
         return {"success": True, "output": error_or_output}
     return {"success": False, "error": error_or_output.get_dict()}
 
+def generate_output(processed_input: str, parameters: dict, request: Request, index: int, outputs: List[Tuple[int, List[str]]]) -> Tuple[int, List[str]]:
+    output = get_output(processed_input, parameters["max_length"], parameters["temperature"], parameters["top_p"])
+
+    if output.startswith("Sorry, the public API is limited to around 20 queries per every 30 minutes."):
+        outputs[index] = None
+        return
+
+    processed_output = process_output(request.input, output, request.language)
+
+    processed_blocks = process_blocks(processed_output, count_leading_spaces(request.input.splitlines()[-1]), COMMENTS[request.language])
+    
+    outputs[index] = (score_code("\n".join(processed_blocks), COMMENTS[request.language]), processed_blocks)
+
 @app.post("/generate")
 async def generate(request: Request):
     # Validating the parameters and setting them to default values if they're empty
@@ -71,12 +84,36 @@ async def generate(request: Request):
 
     # Processing the input & output
     processed_input = process_input(request.input, request.language)
-    output = get_output(processed_input, parameters["max_length"], parameters["temperature"], parameters["top_p"])
-    processed_output = process_output(request.input, output, request.language)
-    processed_blocks = process_blocks(processed_output, count_leading_spaces(request.input.splitlines()[-1]), COMMENTS[request.language])
+
+    # Generate the outputs and pick the best one
+    OUTPUT_COUNT = 2
+
+    # TODO: Rewrite this mess
+    threads = []
+    # outputs = [None for i in range(OUTPUT_COUNT)]
+    outputs = []
+    [outputs.append(None) for i in range(OUTPUT_COUNT)]
+    for i in range(len(outputs)):
+        thread = threading.Thread(target=generate_output, args=(processed_input, parameters, request, i, outputs))
+        thread.start()
+        threads.append(thread)
+    for thread in threads: # Wait until all threads are done
+        while thread.is_alive():
+            time.sleep(0.1)
+    
+    # Validating the outputs
+    for output in outputs:
+        if output == None:
+            return create_response(False, errors.API_LIMIT_EXCEEDED)
+
+    # TODO: Use a sorting function instead of this for loop
+    max_score, best_output = outputs[0]
+    for output in outputs[1:]:
+        if output[0] > max_score:
+            max_score, best_output = output
 
     # Return a response
-    return create_response(True, processed_blocks)
+    return create_response(True, best_output)
 
 if __name__ == "__main__":
     # Starting a thread to update the config when it changes
