@@ -20,19 +20,21 @@ export function activate(context: vscode.ExtensionContext) {
 	// Function that breaks output text into blocks:
 	function break_string(text:string, comment:string) {
 		const blocks = [];
-		var start = 0;
 	
-		while (blocks.join("").length < text.length) {
+		while (blocks.join().trim().length < text.trim().length) {
 			var out = "";
-			const lines = text.split("\n");
-			for (var i = start; i < lines.length; i++) {
-				out += lines[i] + "\n";
-				start += 1;
-				if (lines[i].trim().startsWith(comment)) {
-					break;
-					
+			const lines = text.split(/\r?\n/);
+			for (var i = 0; i < lines.length; i++) {
+				if (comment=="\"\"\"" || comment=="'''"){
+					out += lines[i] + "\n";
+				if (lines[i].trim().endsWith(comment)) {
+					break;}
 				}
-			}
+				else{
+					out += lines[i] + "\n";
+				if (lines[i].trim().startsWith(comment)) {
+					break;}}
+				}
 			blocks.push(out);
 	
 		}
@@ -76,10 +78,10 @@ export function activate(context: vscode.ExtensionContext) {
 			if (extension=="py"){
 				var temp_input = input.trim();
 				var last_line = temp_input.split(/\r?\n/).slice(-1)[0].trim();
-				if (last_line.startsWith('"""')){
-					comment = '"""';
+				if (last_line.endsWith("\"\"\"")){
+					comment = "\"\"\"";
 				}
-				else if (last_line.startsWith("'''")){
+				else if (last_line.endsWith("'''")){
 					comment = "'''";
 				}}
 			
