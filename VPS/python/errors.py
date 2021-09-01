@@ -24,6 +24,7 @@ Error("LANGUAGE_NOT_SUPPORTED", "language is not supported")
 Error("EMPTY_INPUT", "input cannot be empty")
 
 # Token validation
+Error("API_LIMIT_EXCEEDED", "you have exceeded the api limit")
 Error("TOKEN_INVALID", "token is invalid")
 Error("TOKEN_DISABLED", "token has been disabled")
 
