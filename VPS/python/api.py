@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from gpt_output import *
 from logger import Level, Logger
 from text_processing import *
+from token_manager import TokenManager
 
 
 class Request(BaseModel):
@@ -21,7 +22,7 @@ class Request(BaseModel):
     top_p: Optional[float] = None
 
 app = FastAPI()
-logger = Logger()
+logger = Logger(__name__)
 
 config = {}
 def update_config() -> None:
@@ -73,11 +74,11 @@ async def generate(request: Request):
     
     # Checking if the language is supported
     if request.language not in COMMENTS:
-        return create_response(False, errors.LanguageNotSupportedError)
+        return create_response(False, errors.LanguageNotSupportedError())
     
     # Checking if the input is not empty
     if len(request.input.strip()) == 0:
-        return create_response(False, errors.EmptyInputError)
+        return create_response(False, errors.EmptyInputError())
 
     # Loggin the request
     logger.log(Level.INFO, {"input": ("... " + request.input.splitlines()[-1].strip()) if len(request.input.splitlines()) > 0 else "...", "max_length": parameters["max_length"], "temperature": parameters["temperature"], "top_p": parameters["top_p"]})
@@ -88,7 +89,7 @@ async def generate(request: Request):
     # Generate the outputs and pick the best one
     OUTPUT_COUNT = 2
 
-    # TODO: Rewrite this mess
+    # TODO: Rewrite this block of code since it's just really messy
     threads = []
     # outputs = [None for i in range(OUTPUT_COUNT)]
     outputs = []
@@ -104,7 +105,7 @@ async def generate(request: Request):
     # Validating the outputs
     for output in outputs:
         if output == None:
-            return create_response(False, errors.ApiLimitExceededError)
+            return create_response(False, errors.ApiLimitExceededError())
 
     # TODO: Use a sorting function instead of this for loop
     max_score, best_output = outputs[0]
@@ -117,11 +118,14 @@ async def generate(request: Request):
 
 if __name__ == "__main__":
     # Starting a thread to update the config when it changes
-    thread = threading.Thread(target=update_config)
+    thread = threading.Thread(target=update_config, daemon=True)
     thread.start()
 
     # Reading the config file
     with open("config.json", "r") as f:
         config = json.load(f)
+
+    # Creating a token manager
+    token_manager = TokenManager(config["token_path"])
 
     uvicorn.run(app, host=config["host"], port=config["port"], log_level="info")
