@@ -1,11 +1,9 @@
 from typing import *
 
 
-class Error:
+class Error(Exception):
     def __init__(self, code: str, message: Optional[str] = None) -> None:
         self.code = code
-
-        globals()[self.code] = self
 
         if message == None:
             self.message = ""
@@ -15,18 +13,20 @@ class Error:
 
         if not self.message.endswith("."):
             self.message += "."
+
+        super().__init__(self.message)
     
     def get_dict(self) -> dict:
         return {"code": self.code, "message": self.message}
 
 # Code generation
-Error("LANGUAGE_NOT_SUPPORTED", "language is not supported")
-Error("EMPTY_INPUT", "input cannot be empty")
+LanguageNotSupportedError = Error("LANGUAGE_NOT_SUPPORTED", "language is not supported")
+EmptyInputError = Error("EMPTY_INPUT", "input cannot be empty")
 
 # Token validation
-Error("API_LIMIT_EXCEEDED", "you have exceeded the api limit")
-Error("TOKEN_INVALID", "token is invalid")
-Error("TOKEN_DISABLED", "token has been disabled")
+ApiLimitExceededError = Error("API_LIMIT_EXCEEDED", "you have exceeded the api limit")
+TokenInvalidError = Error("TOKEN_INVALID", "token is invalid")
+TokenDisabledError = Error("TOKEN_DISABLED", "token has been disabled")
 
 # Misc
-Error("NONE")
+NoneError = Error("NONE")

@@ -73,11 +73,11 @@ async def generate(request: Request):
     
     # Checking if the language is supported
     if request.language not in COMMENTS:
-        return create_response(False, errors.LANGUAGE_NOT_SUPPORTED)
+        return create_response(False, errors.LanguageNotSupportedError)
     
     # Checking if the input is not empty
     if len(request.input.strip()) == 0:
-        return create_response(False, errors.EMPTY_INPUT)
+        return create_response(False, errors.EmptyInputError)
 
     # Loggin the request
     logger.log(Level.INFO, {"input": ("... " + request.input.splitlines()[-1].strip()) if len(request.input.splitlines()) > 0 else "...", "max_length": parameters["max_length"], "temperature": parameters["temperature"], "top_p": parameters["top_p"]})
@@ -104,7 +104,7 @@ async def generate(request: Request):
     # Validating the outputs
     for output in outputs:
         if output == None:
-            return create_response(False, errors.API_LIMIT_EXCEEDED)
+            return create_response(False, errors.ApiLimitExceededError)
 
     # TODO: Use a sorting function instead of this for loop
     max_score, best_output = outputs[0]
