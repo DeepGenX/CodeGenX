@@ -20,13 +20,15 @@ class Level:
         return [key for key in Level.__dict__][1:][level]
 
 class Logger:
-    def __init__(self, format: Optional[str] = "[{y}-{m}-{d}] [{H}:{M}:{S}]  [{level}]  ") -> str:
+    def __init__(self, name: str, format: Optional[str] = "[{name}]  [{y}-{m}-{d}] [{H}:{M}:{S}]  [{level}]  ") -> str:
+        self.name = name
         self.format = format
     
     def log(self, level: Level, message: str) -> None:
         now = datetime.datetime.now()
         
         print(colored(self.format
+        .replace("{name}", self.name)
         .replace("{y}", str(now.year).zfill(4))
         .replace("{m}", str(now.month).zfill(2))
         .replace("{d}", str(now.day).zfill(2))
