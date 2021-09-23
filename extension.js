@@ -1,5 +1,6 @@
 const vscode = require('vscode');
 const axios = require('axios');
+const fs = require('fs');
 const {
 	URLSearchParams
 } = require('url');
@@ -12,22 +13,27 @@ const top_k = 40;
 function activate(context) {
 	let selectedEditor; //The editor to insert the completion into
 	let selectedRange; //The range to insert the completion into
+	console.log(__dirname);
+	let config = JSON.parse(fs.readFileSync(__dirname + "\\config.json"));
 
 	//A command to open the ClonePilot window
 	context.subscriptions.push(vscode.commands.registerCommand('codegenx.open_CodeGenX', async () => {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) {
-			vscode.window.showInformationMessage('Please open an editor to use ClonePilot.');
+			vscode.window.showInformationMessage('Please open an editor to use CodeGenX.');
 			return;
 		}
 
 		const document = editor.document;
-		let selection = editor.selection;
+		let selection;
+		if(config["settings"]["enable_selection"]) {
+			selection = editor.selection;
+		}
 
-		if (editor.selection.isEmpty) { //If nothing is highlited, get the word at the cursor
+		if (editor.selection.isEmpty || !config["settings"]["enable_selection"]) { //If nothing is highlited, get the word at the cursor
 			const cursorWordRange = editor.document.getWordRangeAtPosition(editor.selection.active);
 			if (!cursorWordRange) {
-				vscode.window.showInformationMessage('Please select or place your cursor on a word to use ClonePilot');
+				vscode.window.showInformationMessage('Please select or place your cursor on a word to use CodeGenX');
 				return; //Cursor not on a word
 			}
 			selection = new vscode.Selection(0, 0, cursorWordRange.end.line, cursorWordRange.end.character);
@@ -37,8 +43,7 @@ function activate(context) {
 		selectedRange = selection;
 
 		const word = document.getText(selection); //The word in the selection
-		console.log("word: " + word);
-		await openClonePilot(word);
+		await open_CodeGenX(word);
 
 	}));
 
@@ -46,13 +51,20 @@ function activate(context) {
 	const textDocumentProvider = new class { //Provides a text document for the window
 		async provideTextDocumentContent(uri) {
 			const params = new URLSearchParams(uri.query);
-			const word = params.get('word');
+			var word = params.get('word');
 			if (params.get('loading') === 'true') {
 				return `/* CodeGenX is generating the output */\n`;
 			}
 
 			try {
+				var current_file;
 				const payload = { 'context': word, 'token_max_length': token_max_length, 'temperature': temp, 'top_p': top_p, 'top_k': top_k};
+				if(config["settings"]["prepend_file"]) {
+					console.log(selectedEditor.document.uri.fsPath);
+					current_file = selectedEditor.document.uri.fsPath;
+					payload["context"] = current_file + ":\n" + word;
+				}
+				console.log("word: " + word);
 				const result = await axios.post(`http://api.vicgalle.net:5000/generate`, null, {params: payload});
 				const content = getGPTText(result.data.text, word);
 				// const response = await axios.get(`https://clone-pilot.herokuapp.com/getFunction/${word}`); //Get the functions for that word
@@ -70,7 +82,7 @@ function activate(context) {
 	context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(myScheme, textDocumentProvider));
 
 	//Open the ClonePilot window to display the functions
-	const openClonePilot = async (word) => {
+	const open_CodeGenX = async (word) => {
 		//A uri to send to the document
 		let loadingUri = vscode.Uri.parse(`${myScheme}:Clone Pilot?word=${word}&loading=true`, true);
 		await showUri(loadingUri); //Open a loading window
@@ -205,7 +217,10 @@ function activate(context) {
 				// console.log(selectedEditor.selection.active)
 				var s = selectedEditor.selection
 
-				editBuilder.replace(s, fn); //Insert the function into the text
+				editBuilder.replace(s, fn) //Insert the function into the text
+			}).then(success => {
+				var postion = selectedEditor.selection.end; 
+				selectedEditor.selection = new vscode.Selection(postion, postion);
 			});
 			// Close the ClonePilot window. The hide function is deprecated, so it must be shown then closed as the active editor.
 			// vscode.window.showTextDocument(myScheme, {
@@ -230,7 +245,7 @@ function activate(context) {
 				title: 'Use code',
 				command: 'clone-pilot.chooseOption',
 				arguments: [
-					fn + '\n\n'
+					fn + '\n'
 				],
 				tooltip: 'Insert this snippet into your code'
 			}));
