@@ -58,7 +58,7 @@ function activate(context) {
 
 			try {
 				var current_file;
-				const payload = { 'context': word, 'token_max_length': token_max_length, 'temperature': temp, 'top_p': top_p, 'top_k': top_k};
+				const payload = { 'context': word, 'token_max_length': token_max_length, 'temperature': temp, 'top_p': top_p, 'top_k': top_k, 'stop_sequence':"<|endoftext|"};
 				if(config["settings"]["prepend_file"]) {
 					console.log(selectedEditor.document.uri.fsPath);
 					current_file = selectedEditor.document.uri.fsPath;
