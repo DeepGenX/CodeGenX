@@ -5,7 +5,7 @@ const {
 	URLSearchParams
 } = require('url');
 
-const token_max_length = 512;
+const token_max_length = 128;
 const temp = 1.0;
 const top_p = 0.6;
 const top_k = 40;
@@ -31,17 +31,14 @@ function activate(context) {
 
 		const document = editor.document;
 		let selection;
-		if(config["enable_selection"]) {
+		if(config["enable_selection"] && !editor.selection.isEmpty) {
 			selection = editor.selection;
+			console.log(document.getText(selection))
 		}
 
-		if (editor.selection.isEmpty || !config["enable_selection"]) { //If nothing is highlited, get the word at the cursor
-			const cursorWordRange = editor.document.getWordRangeAtPosition(editor.selection.active);
-			if (!cursorWordRange) {
-				vscode.window.showInformationMessage('Please select or place your cursor on a word to use CodeGenX');
-				return; //Cursor not on a word
-			}
-			selection = new vscode.Selection(0, 0, cursorWordRange.end.line, cursorWordRange.end.character);
+		else if (editor.selection.isEmpty || !config["enable_selection"]) { //If nothing is highlited, get the word at the cursor;
+  			const cursorPosition = editor.selection.active;
+			selection = new vscode.Selection(0,0,cursorPosition.line, cursorPosition.character);
 		}
 
 		selectedEditor = editor; //Save to be used when the completion is inserted
