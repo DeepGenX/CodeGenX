@@ -9,12 +9,17 @@ const token_max_length = 512;
 const temp = 1.0;
 const top_p = 0.6;
 const top_k = 40;
+const comment_proxy = "cgx_hashtag_comment"
+const workbenchConfig = vscode.workspace.getConfiguration('workbench')
+const theme = workbenchConfig.get('colorTheme')
+console.log(theme)
 
 function activate(context) {
 	let selectedEditor; //The editor to insert the completion into
 	let selectedRange; //The range to insert the completion into
 	console.log(__dirname);
 	let config = JSON.parse(fs.readFileSync(__dirname + "\\config.json"));
+
 
 	//A command to open the ClonePilot window
 	context.subscriptions.push(vscode.commands.registerCommand('codegenx.open_CodeGenX', async () => {
@@ -26,11 +31,11 @@ function activate(context) {
 
 		const document = editor.document;
 		let selection;
-		if(config["settings"]["enable_selection"]) {
+		if(config["enable_selection"]) {
 			selection = editor.selection;
 		}
 
-		if (editor.selection.isEmpty || !config["settings"]["enable_selection"]) { //If nothing is highlited, get the word at the cursor
+		if (editor.selection.isEmpty || !config["enable_selection"]) { //If nothing is highlited, get the word at the cursor
 			const cursorWordRange = editor.document.getWordRangeAtPosition(editor.selection.active);
 			if (!cursorWordRange) {
 				vscode.window.showInformationMessage('Please select or place your cursor on a word to use CodeGenX');
@@ -42,7 +47,8 @@ function activate(context) {
 		selectedEditor = editor; //Save to be used when the completion is inserted
 		selectedRange = selection;
 
-		const word = document.getText(selection); //The word in the selection
+		var word = document.getText(selection); //The word in the selection
+		word = word.replaceAll("#", comment_proxy);
 		await open_CodeGenX(word);
 
 	}));
@@ -57,20 +63,17 @@ function activate(context) {
 			}
 
 			try {
-				var current_file;
-				const payload = { 'context': word, 'token_max_length': token_max_length, 'temperature': temp, 'top_p': top_p, 'top_k': top_k, 'stop_sequence':"<|endoftext|"};
-				if(config["settings"]["prepend_file"]) {
+				word = word.replaceAll(comment_proxy, "#");
+				const payload = { 'context': word, 'token_max_length': token_max_length, 'temperature': temp, 'top_p': top_p, 'top_k': top_k};
+
+				if(config["prepend_file"]) {
 					console.log(selectedEditor.document.uri.fsPath);
-					current_file = selectedEditor.document.uri.fsPath;
+					const current_file = selectedEditor.document.uri.fsPath;
 					payload["context"] = current_file + ":\n" + word;
 				}
-				console.log("word: " + word);
+
 				const result = await axios.post(`http://api.vicgalle.net:5000/generate`, null, {params: payload});
 				const content = getGPTText(result.data.text, word);
-				// const response = await axios.get(`https://clone-pilot.herokuapp.com/getFunction/${word}`); //Get the functions for that word
-				// const fns = response.data.sort((a, b) => b.postScore - a.postScore); //Show the highest score first
-				// const content = getClonePilotText(fns, word);
-				// console.log(content);
 
 				return content;
 			} catch (err) {
@@ -104,10 +107,7 @@ function activate(context) {
 	const getGPTText = (text, word) => {
 		codelensProvider.clearPositions();
 		let content = `/* CodeGenX is suggesting the following */\n\n`;
-		// content += word;
-		// let splitted_text = text.split("\n\n"); //maybe use scopes to split the generated to text
 		text = word + text;
-		console.log("text: " + text);
 		let splitted_text = splitCode(text);
 		for (let i = 0; i < splitted_text.length; i++) {
 			const lineNum = content.split('\n').length; //The line to insert the codelens on
@@ -245,7 +245,7 @@ function activate(context) {
 				title: 'Use code',
 				command: 'clone-pilot.chooseOption',
 				arguments: [
-					fn + '\n'
+					fn
 				],
 				tooltip: 'Insert this snippet into your code'
 			}));
