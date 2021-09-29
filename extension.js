@@ -46,7 +46,7 @@ function activate(context) {
 
 		var word = document.getText(selection); //The word in the selection
 		word = word.replaceAll("#", comment_proxy);
-		await open_CodeGenX(word);
+		await open_CodeGenX(word.trim());
 
 	}));
 
@@ -116,7 +116,7 @@ function activate(context) {
 	}
 
 	const splitCode = (text) => {
-		var splitted = text.replace(/    /g, "\t").split("\n");
+		var splitted = text.replace(/    /g, "\t").split(/\n\s*\n/);
 		var result = [];
 		var final_result = [];
 		var temp = "";
