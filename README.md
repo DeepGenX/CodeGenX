@@ -9,6 +9,8 @@
 ## What is CodeGenX?
 CodeGenX will be a code-completion tool with focus on Python and Javascript. Besides being a non-commercial version of Github Copilot, it will also be available for plenty of different IDEs. 
 
+![demo](https://user-images.githubusercontent.com/61938694/135526136-d40c47b9-7c54-4fec-b031-d2760c19a10a.gif)
+
 ## Current Progress:
 
 - Write extensions for different IDEs
