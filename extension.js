@@ -5,7 +5,7 @@ const {
 	URLSearchParams
 } = require('url');
 
-const currentDocument = editor.document;
+const currentDocument = vscode.window.activeTextEditor.document;
 const configuration = vscode.workspace.getConfiguration('', currentDocument.uri);
 
 const temp = Number(configuration.get('Codegenx.Temperature', {}));
