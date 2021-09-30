@@ -54,6 +54,13 @@
 						"default": "128 (fast)",
 						"description": "The Max length of the output. The longer the output the slower the inference."
 					  },
+
+					  "Codegenx.EnableSelection": {
+						"type": "boolean",
+						"default": true,
+						"description": "Option to generate output for text which is selected."
+					  },
+
 					  "Codegenx.StopSequence": {
 						"type": "string",
 						"default": "<|endoftext|>",
