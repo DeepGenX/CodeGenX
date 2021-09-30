@@ -13,16 +13,8 @@ const top_p = Number(configuration.get('Codegenx.Top_P', {}));
 const top_k = Number(configuration.get('Codegenx.Top_K', {}));
 const token_max_length_str = String(configuration.get('Codegenx.MaxLength', {}));
 const stop_sequence = String(configuration.get('Codegenx.StopSequence', {}));
-
-if (token_max_length_str == "128 (fast)"){
-	const token_max_length = 128
-}
-else if (token_max_length_str == "264 (medium)"){
-	const token_max_length = 264
-}
-else if (token_max_length_str == "512 (slow)"){
-	const token_max_length = 512
-}
+const token_max_length = parseInt(token_max_length_str.slice(0,3))
+console.log("token_max_length:", token_max_length)
 
 const comment_proxy = "cgx_hashtag_comment"
 
