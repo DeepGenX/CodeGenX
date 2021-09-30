@@ -24,6 +24,39 @@
 				"title": "Open CodeGenX",
 				"command": "codegenx.open_CodeGenX"
 			}
+		],
+		"configuration":[
+			{
+				"title": "CodeGenX",
+				"properties": {
+					"Codegenx.Temperature": {
+						"type": "number",
+						"default": 1.0,
+						"description": "The temperature parameter of the GPT-J model"
+					  },
+					  "Codegenx.Top_P": {
+						"type": "number",
+						"default": 0.8,
+						"description": "The top_p parameter of the GPT-J model"
+					  },
+					  "Codegenx.Top_K": {
+						"type": "number",
+						"default": 40,
+						"description": "The top_k parameter of the GPT-J model"
+					  },
+					  "Codegenx.MaxLength": {
+						"type": "string",
+						"default": 512,
+						"description": "The Max length of the output. The longer the output the slower the inference. Recommended option (128 = fast, 264 = medium, 512 = slow)"
+					  },
+					  "Codegenx.StopSequence": {
+						"type": "string",
+						"default": "<|endoftext|>",
+						"description": "The stop_sequence parameter of the GPT-J model"
+					  }
+					  
+				}
+			}
 		]
 	},
 	"scripts": {

@@ -5,20 +5,23 @@ const {
 	URLSearchParams
 } = require('url');
 
-const token_max_length = 128;
-const temp = 1.0;
-const top_p = 0.6;
-const top_k = 40;
+const currentDocument = editor.document;
+const configuration = vscode.workspace.getConfiguration('', currentDocument.uri);
+
+const temp = Number(configuration.get('Codegenx.Temperature', {}));
+const top_p = Number(configuration.get('Codegenx.Top_P', {}));
+const top_k = Number(configuration.get('Codegenx.Top_K', {}));
+const token_max_length = Number(configuration.get('Codegenx.MaxLength', {}));
+const stop_sequence = String(configuration.get('Codegenx.StopSequence', {}));
+
 const comment_proxy = "cgx_hashtag_comment"
-const workbenchConfig = vscode.workspace.getConfiguration('workbench')
-const theme = workbenchConfig.get('colorTheme')
-console.log(theme)
 
 function activate(context) {
 	let selectedEditor; //The editor to insert the completion into
 	let selectedRange; //The range to insert the completion into
 	console.log(__dirname);
 	let config = JSON.parse(fs.readFileSync(__dirname + "\\config.json"));
+	let selected_text;
 
 
 	//A command to open the ClonePilot window
@@ -34,16 +37,19 @@ function activate(context) {
 		if(config.settings["enable_selection"] && !editor.selection.isEmpty) {
 			selection = editor.selection;
 			console.log(document.getText(selection))
+			selected_text = true;
 		}
 
 		else if (editor.selection.isEmpty || !config.settings["enable_selection"]) { //If nothing is highlited, get the word at the cursor;
   			const cursorPosition = editor.selection.active;
 			selection = new vscode.Selection(0,0,cursorPosition.line, cursorPosition.character);
+			selected_text = false;
 		}
 
 		selectedEditor = editor; //Save to be used when the completion is inserted
 		selectedRange = selection;
 
+		console.log("selected_text:",selected_text)
 		var word = document.getText(selection); //The word in the selection
 		word = word.replaceAll("#", comment_proxy);
 		await open_CodeGenX(word.trim());
@@ -61,7 +67,7 @@ function activate(context) {
 
 			try {
 				word = word.replaceAll(comment_proxy, "#");
-				const payload = { 'context': word, 'token_max_length': token_max_length, 'temperature': temp, 'top_p': top_p, 'top_k': top_k};
+				const payload = { 'context': word, 'token_max_length': token_max_length, 'temperature': temp, 'top_p': top_p, 'top_k': top_k, 'stop_sequence':stop_sequence};
 
 				if(config.settings["prepend_file"]) {
 					console.log(selectedEditor.document.uri.fsPath);
@@ -203,15 +209,6 @@ function activate(context) {
 		if (!selectedEditor) return;
 		try {
 			selectedEditor.edit(editBuilder => {
-				// const formatted = formatFunction(fn);
-				// editBuilder.replace(selectedRange, beautify(formatted.header + formatted.body, beautifyOptions)); //Insert the function into the text
-				// var editor = vscode.window.activeTextEditor;
-				// var lastLine = editor.document.lineAt(editor.document.lineCount - 1);
-				// let s = new vscode.Selection(lastLine.range.end, lastLine.range.end);
-
-				// const cursorWordRange = selectedEditor.document.getWordRangeAtPosition(selectedEditor.selection.active);
-				// console.log(cursorWordRange.start.line, cursorWordRange.start.character, cursorWordRange.end.line, cursorWordRange.end.character)
-				// console.log(selectedEditor.selection.active)
 				var s = selectedEditor.selection
 
 				editBuilder.replace(s, fn) //Insert the function into the text
@@ -219,14 +216,6 @@ function activate(context) {
 				var postion = selectedEditor.selection.end; 
 				selectedEditor.selection = new vscode.Selection(postion, postion);
 			});
-			// Close the ClonePilot window. The hide function is deprecated, so it must be shown then closed as the active editor.
-			// vscode.window.showTextDocument(myScheme, {
-			// 		preview: true,
-			// 		preserveFocus: false
-			// 	})
-			// 	.then(() => {
-			// 		return vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-			// 	});
 		} catch (e) {
 			//The editor isn't open
 		}
