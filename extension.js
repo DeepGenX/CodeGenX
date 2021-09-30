@@ -31,12 +31,12 @@ function activate(context) {
 
 		const document = editor.document;
 		let selection;
-		if(config["enable_selection"] && !editor.selection.isEmpty) {
+		if(config.settings["enable_selection"] && !editor.selection.isEmpty) {
 			selection = editor.selection;
 			console.log(document.getText(selection))
 		}
 
-		else if (editor.selection.isEmpty || !config["enable_selection"]) { //If nothing is highlited, get the word at the cursor;
+		else if (editor.selection.isEmpty || !config.settings["enable_selection"]) { //If nothing is highlited, get the word at the cursor;
   			const cursorPosition = editor.selection.active;
 			selection = new vscode.Selection(0,0,cursorPosition.line, cursorPosition.character);
 		}
@@ -63,7 +63,7 @@ function activate(context) {
 				word = word.replaceAll(comment_proxy, "#");
 				const payload = { 'context': word, 'token_max_length': token_max_length, 'temperature': temp, 'top_p': top_p, 'top_k': top_k};
 
-				if(config["prepend_file"]) {
+				if(config.settings["prepend_file"]) {
 					console.log(selectedEditor.document.uri.fsPath);
 					const current_file = selectedEditor.document.uri.fsPath;
 					payload["context"] = current_file + ":\n" + word;
