@@ -45,9 +45,14 @@
 						"description": "The top_k parameter of the GPT-J model"
 					  },
 					  "Codegenx.MaxLength": {
-						"type": "number",
-						"default": 512,
-						"description": "The Max length of the output. The longer the output the slower the inference. Recommended option (128 = fast, 264 = medium, 512 = slow)"
+						"type": "string",
+						"enum": [
+                        "128 (fast)",
+                        "264 (medium)",
+						"512 (slow)"
+                    ],
+						"default": "128 (fast)",
+						"description": "The Max length of the output. The longer the output the slower the inference."
 					  },
 					  "Codegenx.StopSequence": {
 						"type": "string",
