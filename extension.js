@@ -5,26 +5,27 @@ const {
 	URLSearchParams
 } = require('url');
 
+
+// Accessing settings from vscode:
 const currentDocument = vscode.window.activeTextEditor.document;
 const configuration = vscode.workspace.getConfiguration('', currentDocument.uri);
-
 const temp = Number(configuration.get('Codegenx.Temperature', {}));
 const top_p = Number(configuration.get('Codegenx.Top_P', {}));
 const top_k = Number(configuration.get('Codegenx.Top_K', {}));
 const token_max_length_str = String(configuration.get('Codegenx.MaxLength', {}));
 const stop_sequence = String(configuration.get('Codegenx.StopSequence', {}));
+const enable_selection = Boolean(configuration.get('Codegenx.EnableSelection', {}));
+
+// Converting token_max_length from string to length (128 (fast) -> 128):
 const token_max_length = parseInt(token_max_length_str.slice(0,3))
 console.log("token_max_length:", token_max_length)
 
+// The comment proxy whcih replaces the hashtag (#)
 const comment_proxy = "cgx_hashtag_comment"
 
 function activate(context) {
 	let selectedEditor; //The editor to insert the completion into
-	let selectedRange; //The range to insert the completion into
-	console.log(__dirname);
-	let config = JSON.parse(fs.readFileSync(__dirname + "\\config.json"));
 	let selected_text;
-
 
 	//A command to open the ClonePilot window
 	context.subscriptions.push(vscode.commands.registerCommand('codegenx.open_CodeGenX', async () => {
@@ -36,13 +37,13 @@ function activate(context) {
 
 		const document = editor.document;
 		let selection;
-		if(config.settings["enable_selection"] && !editor.selection.isEmpty) {
+		if(enable_selection && !editor.selection.isEmpty) {
 			selection = editor.selection;
 			console.log(document.getText(selection))
 			selected_text = true;
 		}
 
-		else if (editor.selection.isEmpty || !config.settings["enable_selection"]) { //If nothing is highlited, get the word at the cursor;
+		else if (editor.selection.isEmpty || !enable_selection) { //If nothing is highlited, get the word at the cursor;
   			const cursorPosition = editor.selection.active;
 			selection = new vscode.Selection(0,0,cursorPosition.line, cursorPosition.character);
 			selected_text = false;
@@ -70,12 +71,6 @@ function activate(context) {
 			try {
 				word = word.replaceAll(comment_proxy, "#");
 				const payload = { 'context': word, 'token_max_length': token_max_length, 'temperature': temp, 'top_p': top_p, 'top_k': top_k, 'stop_sequence':stop_sequence};
-
-				if(config.settings["prepend_file"]) {
-					console.log(selectedEditor.document.uri.fsPath);
-					const current_file = selectedEditor.document.uri.fsPath;
-					payload["context"] = current_file + ":\n" + word;
-				}
 
 				const result = await axios.post(`http://api.vicgalle.net:5000/generate`, null, {params: payload});
 				const content = getGPTText(result.data.text, word);
