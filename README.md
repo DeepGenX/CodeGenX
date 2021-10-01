@@ -1,7 +1,7 @@
 # CodeGenX
 
 <p align="center">
-  <img src="logo.png" height=200 />
+  <img src="assets/logo.png" height=200 />
 <p/>
 
 ### Disclaimer: This project is still being developed and there is no ready-to-use application yet.
