@@ -3,21 +3,47 @@
 	"publisher": "DeepGenX",
 	"displayName": "CodeGenX",
 	"description": "CodeGenX - A code autocompletion tool based on GPT-J",
+	"license": "SEE LICENSE IN LICENSE",
+	"homepage": "https://github.com/DeepGenX/CodeGenX",
+	"author": {
+		"name": "DeepGenX",
+		"email": "deepgenx@gmail.com",
+		"url": "https://deepgenx.com"
+	},
+	"keywords": [
+		"generation",
+		"code",
+		"copilot",
+		"deepgenx",
+		"autocomplete",
+		"completion",
+		"codegenx",
+		"open-source"
+	],
+	"qna": "https://github.com/DeepGenX/CodeGenX/discussions/categories/q-a",
+	"bugs": {
+		"url": "https://github.com/DeepGenX/CodeGenX/issues",
+		"email": "deepgenx@gmail.com"
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/DeepGenX/CodeGenX"
 	},
+	"icon": "assets/logo.ico",
 	"version": "0.1.0",
 	"engines": {
 		"vscode": "^1.57.0"
 	},
 	"categories": [
-		"Other"
+		"Other",
+		"Machine Learning",
+		"Data Science",
+		"Programming Languages"
 	],
 	"activationEvents": [
 		"onCommand:codegenx.open_CodeGenX"
 	],
-	"main": "./extension.js",
+	"main": "./src/extension.js",
 	"contributes": {
 		"commands": [
 			{
@@ -25,7 +51,7 @@
 				"command": "codegenx.open_CodeGenX"
 			}
 		],
-		"configuration":[
+		"configuration": [
 			{
 				"title": "CodeGenX",
 				"properties": {
@@ -33,50 +59,47 @@
 						"type": "number",
 						"default": 1.0,
 						"description": "The temperature parameter of the GPT-J model"
-					  },
-					  "Codegenx.Top_P": {
+					},
+					"Codegenx.Top_P": {
 						"type": "number",
 						"default": 0.8,
 						"description": "The top_p parameter of the GPT-J model"
-					  },
-					  "Codegenx.Top_K": {
+					},
+					"Codegenx.Top_K": {
 						"type": "number",
 						"default": 40,
 						"description": "The top_k parameter of the GPT-J model"
-					  },
-					  "Codegenx.MaxLength": {
+					},
+					"Codegenx.MaxLength": {
 						"type": "string",
 						"enum": [
-                        "128 (fast)",
-                        "264 (medium)",
-						"512 (slow)"
-                    ],
+							"128 (fast)",
+							"264 (medium)",
+							"512 (slow)"
+						],
 						"default": "128 (fast)",
 						"description": "The Max length of the output. The longer the output the slower the inference."
-					  },
-
-					  "Codegenx.EnableSelection": {
+					},
+					"Codegenx.EnableSelection": {
 						"type": "boolean",
 						"default": true,
 						"description": "Option to generate output for text which is selected."
-					  },
-
-					  "Codegenx.StopSequence": {
+					},
+					"Codegenx.StopSequence": {
 						"type": "string",
 						"default": "<|endoftext|>",
 						"description": "The stop_sequence parameter of the GPT-J model"
-					  }
-					  
+					}
 				}
 			}
 		],
 		"keybindings": [
-            {
-                "command": "codegenx.open_CodeGenX",
-                "key": "ctrl+c",
-                "mac": "cmd+c"
-            }
-        ]
+			{
+				"command": "codegenx.open_CodeGenX",
+				"key": "ctrl+d",
+				"mac": "cmd+d"
+			}
+		]
 	},
 	"scripts": {
 		"lint": "eslint .",
