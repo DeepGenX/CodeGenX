@@ -21,7 +21,7 @@
 	"contributes": {
 		"commands": [
 			{
-				"title": "Open CodeGenX",
+				"title": "CodeGenX: Get AI Completion",
 				"command": "codegenx.open_CodeGenX"
 			}
 		],
@@ -69,7 +69,14 @@
 					  
 				}
 			}
-		]
+		],
+		"keybindings": [
+            {
+                "command": "codegenx.open_CodeGenX",
+                "key": "ctrl+c",
+                "mac": "cmd+c"
+            }
+        ]
 	},
 	"scripts": {
 		"lint": "eslint .",
