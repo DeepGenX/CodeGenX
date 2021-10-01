@@ -46,6 +46,7 @@ function activate(context) {
 		else if (editor.selection.isEmpty || !enable_selection) { //If nothing is highlited, get the word at the cursor;
   			const cursorPosition = editor.selection.active;
 			selection = new vscode.Selection(0,0,cursorPosition.line, cursorPosition.character);
+			console.log(document.getText(selection))
 			selected_text = false;
 		}
 
@@ -107,13 +108,12 @@ function activate(context) {
 	const getGPTText = (text, word) => {
 		codelensProvider.clearPositions();
 		let content = `/* CodeGenX is suggesting the following */\n\n`;
-		text = word + text;
 		let splitted_text = splitCode(text);
 		for (let i = 0; i < splitted_text.length; i++) {
 			const lineNum = content.split('\n').length; //The line to insert the codelens on
 			codelensProvider.addPosition(lineNum, splitted_text[i]); //Add a codelens on that line
 			content += splitted_text[i]; //Display the entire function in the ClonePilot window
-			if (i < splitted_text.length - 1) content += '\n\n';
+			if (i < splitted_text.length - 1) content += '\n';
 		}
 		return content;
 	}
