@@ -13,13 +13,16 @@ from logger import Level, Logger
 from text_processing import *
 from token_manager import TokenManager
 
-class Request(BaseModel):
+class GenerationRequest(BaseModel):
     token: str
     language: str
     input: str
     max_length: Optional[int] = None
     temperature: Optional[float] = None
     top_p: Optional[float] = None
+
+class RegistrationRequest(BaseModel):
+    email: str
 
 app = FastAPI()
 logger = Logger(__name__)
@@ -46,7 +49,7 @@ def create_response(success: bool, error_or_output: Union[errors.Error, str]) ->
         return {"success": True, "output": error_or_output}
     return {"success": False, "error": error_or_output.get_dict()}
 
-def generate_output(processed_input: str, parameters: dict, request: Request) -> Tuple[int, List[str]]:
+def generate_output(processed_input: str, parameters: dict, request: GenerationRequest) -> Tuple[int, List[str]]:
     output = get_output(processed_input, parameters["max_length"], parameters["temperature"], parameters["top_p"])
 
     if output.startswith("Sorry, the public API is limited to around 20 queries per every 30 minutes."): # TODO: Remove this when our own model is deployed
@@ -59,7 +62,7 @@ def generate_output(processed_input: str, parameters: dict, request: Request) ->
     return processed_blocks
 
 @app.post("/generate")
-async def generate(request: Request):
+async def generate(request: GenerationRequest):
     # Validate the token
     error = token_manager.validate_token(request.token)
     if error != None:
@@ -99,6 +102,10 @@ async def generate(request: Request):
 
     # Return a response
     return create_response(True, output)
+
+@app.post("/register")
+async def register(request: RegistrationRequest):
+    raise NotImplementedError
 
 if __name__ == "__main__":
     # Starting a thread to update the config when it changes
