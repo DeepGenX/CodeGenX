@@ -18,7 +18,7 @@ def count_leading_spaces(line: str) -> int:
     count = 0
 
     for char in line: # Loop through the characters in the line
-        if char == " ": # If we encouter a space, add 1 to the count
+        if char == " ": # If we encouter a space, increment count
             count += 1
         else: # Else, we've run out of leading spaces and we can now stop counting
             break
@@ -43,7 +43,7 @@ def text_to_blocks(text: str, comment: str) -> List[str]:
             block += line + "\n"
             start += 1
 
-            # https://www.python.org/dev/peps/pep-0008/#multiline-if-statements suggests this, if someone has a better and more clean way of doing this, be my guest
+            # https://www.python.org/dev/peps/pep-0008/#multiline-if-statements suggests formatting multiline if statements like this, if someone has a better and more clean way of doing this, be my guest
             if (line.strip().startswith(comment) and
                     current_indent == start_indent and
                     not all([l.strip().startswith(comment) for l in block.splitlines()]) and
