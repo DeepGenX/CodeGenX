@@ -18,7 +18,7 @@ class TokenManager:
 
 	def __store_tokens(self) -> None:
 		with open(self.token_path, "w") as f:
-			f.write("\n".join(self.tokens))
+			pickle.dump(self.tokens, f)
 
 	def add_token(self, email: str) -> str:
 		# Check if there already exists a token with this email
