@@ -51,7 +51,7 @@ def text_to_blocks(text: str, comment: str) -> List[str]:
                     not text.splitlines()[start + i + 1].strip().startswith(comment)):
                 break
         
-        blocks.append(block)
+        blocks.append(block) # Append the current block to the list of blocks
     
     return blocks
 
