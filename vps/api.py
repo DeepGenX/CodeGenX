@@ -14,6 +14,7 @@ from text_processing import *
 from token_manager import TokenManager
 
 class Request(BaseModel):
+    token: str
     language: str
     input: str
     max_length: Optional[int] = None
@@ -40,7 +41,7 @@ def update_config() -> None:
 
             time.sleep(3)
 
-def create_response(success: bool, error_or_output: Union[str, dict]) -> dict:
+def create_response(success: bool, error_or_output: Union[errors.Error, str]) -> dict:
     if success:
         return {"success": True, "output": error_or_output}
     return {"success": False, "error": error_or_output.get_dict()}
@@ -59,6 +60,11 @@ def generate_output(processed_input: str, parameters: dict, request: Request) ->
 
 @app.post("/generate")
 async def generate(request: Request):
+    # Validate the token
+    error = token_manager.validate_token(request.token)
+    if error != None:
+        return create_response(False, error)
+
     # Validating the parameters and setting them to default values if they're empty
     parameters = {
         "max_length": request.max_length,
