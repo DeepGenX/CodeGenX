@@ -1,6 +1,7 @@
 import hashlib
 import secrets
 import errors
+import pickle
 
 def generate_token(email: str) -> str:
 	return f"{secrets.token_hex(16)}.{hash(email)}"
@@ -13,7 +14,7 @@ class TokenManager:
 		self.token_path = token_path
 		
 		with open(self.token_path, "r") as f:
-			self.tokens = set(f.readlines())
+			self.tokens = pickle.load(f)
 
 	def __store_tokens(self) -> None:
 		with open(self.token_path, "w") as f:
