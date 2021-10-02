@@ -94,17 +94,6 @@ def process_output(input: str, output: str, extension: str) -> str:
 
     return processed_output
 
-def is_sentence(line: str, comment: str) -> bool:
-    "Returns a boolean indicating whether the given line is an english sentence or a line of code."
-
-    if line.strip().startswith(comment): # If it starts with a comment, it is most likely code (even if it's not, it will be compiled anyway so we can just add it to be sure)
-        return False
-
-    if len(line.lstrip()) < len(line): # If the line starts with whitespace, it is probably code
-        return False
-
-    return False # TODO: Make this function return True if the line is likely to be an English sentence
-
 def process_blocks(blocks: List[str], start_indent: int, comment: str) -> List[str]:
     "Processes blocks of strings to filter out the ones we don't want."
 
@@ -118,7 +107,7 @@ def process_blocks(blocks: List[str], start_indent: int, comment: str) -> List[s
                 processed_block += line + "\n"
                 continue
             
-            if line.strip() == "A:" or count_leading_spaces(line) < start_indent or is_sentence(line, comment): # Stop adding blocks if gpt-j is starting to write an answer ("A:"), or if the current line is indented less than the first one, or if the current line is a sentence and not code
+            if line.strip() == "A:" or count_leading_spaces(line) < start_indent: # Stop adding blocks if gpt-j is starting to write an answer ("A:"), or if the current line is indented less than the first one
                 processed_blocks.append(processed_block)
                 return processed_blocks
             
