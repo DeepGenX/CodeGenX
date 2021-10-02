@@ -1,6 +1,5 @@
 from typing import *
 
-
 COMMENTS = {
     "py": "#", # Python
     "c": "//", # C
