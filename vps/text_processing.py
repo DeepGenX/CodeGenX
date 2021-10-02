@@ -53,7 +53,7 @@ def text_to_blocks(text: str, comment: str) -> List[str]:
 def process_input(input: str, language: str) -> str:
     "Processes the input so that GPT-J can understand it better and generate more relevant text."
 
-    return input.rstrip().replace("\t", "    ") + ".\n"
+    return input.replace("\t", "    ")
 
 def process_output(input: str, output: str, extension: str) -> str:
     "Processes the GPT-J output so that it only contains relevant text."
