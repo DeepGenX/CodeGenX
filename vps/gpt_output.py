@@ -2,7 +2,6 @@
 
 import requests
 
-
 # When editing this function, make sure not to change the parameters unless it is really needed
 def get_output(input: str, max_length: int, temperature: float, top_p: float):
     "Send a request to the api to generate a response for the given context."

@@ -3,7 +3,6 @@ from typing import *
 
 from termcolor import colored
 
-
 class Level:
     ERROR = 0
     WARNING = 1

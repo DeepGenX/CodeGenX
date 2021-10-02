@@ -13,7 +13,6 @@ from logger import Level, Logger
 from text_processing import *
 from token_manager import TokenManager
 
-
 class Request(BaseModel):
     language: str
     input: str
