@@ -74,7 +74,7 @@ function activate(context) {
 				const payload = { 'context': word, 'token_max_length': token_max_length, 'temperature': temp, 'top_p': top_p, 'top_k': top_k, 'stop_sequence':stop_sequence};
 
 				const result = await axios.post(`http://api.vicgalle.net:5000/generate`, null, {params: payload});
-				const content = getGPTText(result.data.text, word);
+				const content = getGPTText(result.data.text);
 
 				return content;
 			} catch (err) {
@@ -105,7 +105,7 @@ function activate(context) {
 		vscode.languages.setTextDocumentLanguage(doc, 'python'); //Enables syntax highlighting
 	}
 
-	const getGPTText = (text, word) => {
+	const getGPTText = (text) => {
 		codelensProvider.clearPositions();
 		let content = `/* CodeGenX is suggesting the following */\n\n`;
 		let splitted_text = splitCode(text);
