@@ -64,6 +64,10 @@ async def generate(request: Request):
     error = token_manager.validate_token(request.token)
     if error != None:
         return create_response(False, error)
+    
+    # If the api limit has been exceeded, return an error message
+    if token_manager.cooldowns[request.token] == 0:
+        return create_response(False, errors.ApiLimitExceededError(request.token))
 
     # Validating the parameters and setting them to default values if they're empty
     parameters = {
@@ -88,6 +92,10 @@ async def generate(request: Request):
 
     # Generate the output
     output = generate_output(processed_input, parameters, request)
+
+    # Decrementing the amount of requests the user can make this minute
+    if token_manager.cooldowns[request.token] > 0:
+        token_manager.cooldowns[request.token] -= 1
 
     # Return a response
     return create_response(True, output)

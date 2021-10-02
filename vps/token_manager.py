@@ -19,6 +19,10 @@ class TokenManager:
 		
 		with open(self.token_path, "r") as f:
 			self.tokens, self.disabled = pickle.load(f)
+		
+		self.cooldowns = {}
+		for token in self.tokens:
+			self.cooldowns[token] = REQUESTS_PER_MINUTE
 
 	def __store_tokens(self) -> None:
 		with open(self.token_path, "w") as f:
