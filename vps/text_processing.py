@@ -31,22 +31,27 @@ def text_to_blocks(text: str, comment: str) -> List[str]:
     blocks = []
     start = 0
 
+    # While the entire text is not split up into blocks
     while len("".join(blocks)) < len(text):
-        out = ""
+        block = "" # Create a string variable for the current block
 
         start_indent = count_leading_spaces(text.splitlines()[start])
 
         for i, line in enumerate(text.splitlines()[start:]):
             current_indent = count_leading_spaces(line)
 
-            out += line + "\n"
+            block += line + "\n"
             start += 1
 
-            if line.strip().startswith(comment) and current_indent == start_indent and not all([l.strip().startswith(comment) for l in out.splitlines()]):
-                if start + i + 1 < len(text.splitlines()[start:]) and not text.splitlines()[start + i + 1].strip().startswith(comment):
-                    break
+            # https://www.python.org/dev/peps/pep-0008/#multiline-if-statements suggests this, if someone has a better and more clean way of doing this, be my guest
+            if (line.strip().startswith(comment) and
+                    current_indent == start_indent and
+                    not all([l.strip().startswith(comment) for l in block.splitlines()]) and
+                    start + i + 1 < len(text.splitlines()[start:]) and
+                    not text.splitlines()[start + i + 1].strip().startswith(comment)):
+                break
         
-        blocks.append(out)
+        blocks.append(block)
     
     return blocks
 
@@ -107,7 +112,7 @@ def process_blocks(blocks: List[str], start_indent: int, comment: str) -> List[s
                 processed_block += line + "\n"
                 continue
             
-            if line.strip() == "A:" or count_leading_spaces(line) < start_indent: # Stop adding blocks if gpt-j is starting to write an answer ("A:"), or if the current line is indented less than the first one
+            if line.strip().lower() == "a:" or count_leading_spaces(line) < start_indent: # Stop adding blocks if gpt-j is starting to write an answer ("A:"), or if the current line is indented less than the first one
                 processed_blocks.append(processed_block)
                 return processed_blocks
             
