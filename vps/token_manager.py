@@ -23,11 +23,16 @@ class TokenManager:
 
 		self.tokens: Set[str] = tokens
 		self.disabled: Set[str] = disabled
+
+		self.__store_tokens()
 		
 		self.cooldowns = {}
 		self.update_all_cooldowns()
 
 	def __store_tokens(self) -> None:
+		self.all = self.tokens.copy()
+		self.all.update(self.disabled)
+
 		with open(self.token_path, "wb") as f:
 			pickle.dump((self.tokens, self.disabled), f)
 
@@ -52,7 +57,7 @@ class TokenManager:
 
 	def get_token(self, email: str) -> Optional[str]:
 		hashedEmail = hash(email)
-		for token in self.tokens | self.disabled:
+		for token in self.all:
 			if token.split(".")[-1] == hashedEmail: # Compare the hashed email to the one in the token
 				return token
 
@@ -85,6 +90,9 @@ class TokenManager:
 		
 		self.tokens.remove(token)
 		self.disabled.add(token)
+
+		# Update the token file
+		self.__store_tokens()
 	
 	def update_cooldown(self, token: str) -> None:
 		self.cooldowns[token] = REQUESTS_PER_MINUTE

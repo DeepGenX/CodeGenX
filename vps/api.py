@@ -18,9 +18,9 @@ class GenerationRequest(BaseModel):
     token: str
     language: str
     input: str
-    max_length: Optional[int] = None
-    temperature: Optional[float] = None
-    top_p: Optional[float] = None
+    max_length: Optional[int] = 512
+    temperature: Optional[float] = 1.0
+    top_p: Optional[float] = 0.9
 
 class RegistrationRequest(BaseModel):
     email: str
