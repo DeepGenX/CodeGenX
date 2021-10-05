@@ -13,7 +13,7 @@ print("Token Manager Shell")
 print("===================")
 while True:
     try:
-        print(exec(input("> ")))
+        print(eval(input("> ")))
     except KeyboardInterrupt:
         exit()
     except Exception as e:

@@ -2,5 +2,5 @@
     "host": "0.0.0.0",
     "port": 5700,
 
-    "token_path": "path/to/token/file"
+    "token_path": "../../tokens"
 }

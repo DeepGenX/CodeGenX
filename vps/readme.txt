@@ -20,3 +20,6 @@ When something goes wrong the error value will be set, here is a list of what ev
 - LANGUAGE_NOT_SUPPORTED: The language specified in the request is not supported by the text processing functions and thus the code for it can not be generated
 - TOKEN_INVALID: The token specified in the request is invalid, maybe someone made a typo or maybe the user did not generate a token yet
 - TOKEN_DISABLED: The token specified in the request has been disabled because it has been used in a way that is not permitted
+
+Misc:
+- Token format: {Hash function used}.{64 Random characters}.{Hashed email}
