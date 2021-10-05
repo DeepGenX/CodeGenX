@@ -1,8 +1,9 @@
 ### Code generation:
 To generate output for a given input, send a post request to http://ADDRESS:PORT/generate and specify these parameters:
+- token: The token to authenticate the request
 - input: The code that the user has written so far (from the start of the document to the line that the cursor is on, including that line)
 - language: The language that the code is being written in, use the extension of the file (examples: C++ would be cpp, C# would be cs, Python would be py, JavaScript would be js, etc.)
-- max_length (optional): 
+- max_length (optional): The max amount of tokens to generate
 - temperature (optional): I have no clue what this does, it's used for generating output with GPT-J, unless you know what it does, just leave it out and it'll be defaulted to whatever it is in the config file
 - top_p (optional): Same thing as temperature, no clue, if left empty, it's set to the default in the config file
 
