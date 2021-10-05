@@ -16,7 +16,7 @@ Examples:
 {"success": true, "message": ["abjiwjiodaoijdw"]}
 {"success", false, "error": {"code": "MISSING_PARAMETER", "message": "Missing input parameter."}}
 
-### Errors and their meanings:
+### Errors and their meanings (outdated):
 When something goes wrong the error value will be set, here is a list of what every error means:
 - LANGUAGE_NOT_SUPPORTED: The language specified in the request is not supported by the text processing functions and thus the code for it can not be generated
 - TOKEN_INVALID: The token specified in the request is invalid, maybe someone made a typo or maybe the user did not generate a token yet
