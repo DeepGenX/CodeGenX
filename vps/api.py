@@ -62,6 +62,9 @@ def generate_output(processed_input: str, parameters: dict, request: GenerationR
     
     return processed_blocks
 
+def send_token(token: str, email: str) -> None:
+    ... # TODO: Write this function
+
 @app.post("/generate")
 async def generate(request: GenerationRequest):
     # Validate the token
@@ -109,7 +112,8 @@ async def register(request: RegistrationRequest):
     # If the email has already been used
     try:
         token = token_manager.add_token(request.email)
-        return create_response(True, token)
+        send_token(token, request.email)
+        return create_response(True, f"Token sent to {request.email}.")
     except errors.EmailAlreadyUsed as e:
         return create_response(False, e)
 
