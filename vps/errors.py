@@ -58,3 +58,8 @@ class ApiLimitExceededError(TokenError):
 class TokenAlreadyExistsError(TokenError):
     def __init__(self, token: str) -> None:
         super().__init__(token, "TOKEN_ALREADY_EXISTS", f"token \"{token}\" already exists")
+
+# Misc errors
+class EmailAlreadyUsed(Error):
+    def __init__(self, email: str) -> None:
+        super().__init__("EMAIL_ALREADY_USED", f"email \"{email}\" has already been used")

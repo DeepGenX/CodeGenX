@@ -10,9 +10,9 @@ Response format:
 The response format is a json string containing these values:
 - success: Success contains a boolean that specifies whether the processing of the request went well or failed, if it's true, it means that everything is fine and you should be able to read the output, if not, take a look at the error value
 - error (only present when success is false): When success is false the error value will be set to a json object containing a code and a string giving a basic description of what went wrong
-- output (only present when success is true): When success is true the output value will be set to whatever GPT-J outputted after it has been parsed
+- message (only present when success is true): When success is true the message value will be set to whatever GPT-J outputted after it has been parsed
 Examples:
-{"success": true, "output": ["abjiwjiodaoijdw"]}
+{"success": true, "message": ["abjiwjiodaoijdw"]}
 {"success", false, "error": {"code": "MISSING_PARAMETER", "message": "Missing input parameter."}}
 
 Errors and their meanings:

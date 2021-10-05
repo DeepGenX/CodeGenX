@@ -1,3 +1,4 @@
+from os import error
 import errors
 import json
 import threading
@@ -44,10 +45,10 @@ def update_config() -> None:
 
             time.sleep(3)
 
-def create_response(success: bool, error_or_output: Union[errors.Error, str]) -> dict:
+def create_response(success: bool, error_or_message: Optional[Union[errors.Error, str]] = None) -> dict:
     if success:
-        return {"success": True, "output": error_or_output}
-    return {"success": False, "error": error_or_output.get_dict()}
+        return {"success": True, "message": error_or_message}
+    return {"success": False, "error": error_or_message.get_dict()}
 
 def generate_output(processed_input: str, parameters: dict, request: GenerationRequest) -> Tuple[int, List[str]]:
     output = get_output(processed_input, parameters["max_length"], parameters["temperature"], parameters["top_p"])
@@ -105,7 +106,12 @@ async def generate(request: GenerationRequest):
 
 @app.post("/register")
 async def register(request: RegistrationRequest):
-    raise NotImplementedError
+    # If the email has already been used
+    try:
+        token = token_manager.add_token(request.email)
+        return create_response(True, token)
+    except errors.EmailAlreadyUsed as e:
+        return create_response(False, e)
 
 if __name__ == "__main__":
     # Starting a thread to update the config when it changes

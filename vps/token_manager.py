@@ -58,8 +58,8 @@ class TokenManager:
 
 	def add_token(self, email: str) -> str:
 		# Check if there already exists a token with this email
-		if (token := self.get_token(email)) != None:
-			raise errors.TokenAlreadyExistsError(token)
+		if self.get_token(email) != None:
+			raise errors.EmailAlreadyUsed(email)
 
 		# Else, create a new token
 		token = generate_token(email)
