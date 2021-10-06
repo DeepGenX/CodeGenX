@@ -73,6 +73,10 @@ class EmailVerificationAlreadySent(EmailError):
     def __init__(self, email: str) -> None:
         super().__init__(email, "EMAIL_VERIFICATION_ALREADY_SENT", f"a verification email has already been sent to \"{email}\"")
 
+class EmailAddressInvalid(EmailError):
+    def __init__(self, email: str) -> None:
+        super().__init__(email, "EMAIL_ADDRESS_INVALID", f"email address \"{email}\" is not valid")
+
 # Verification errors
 class VerificationError(Error):
     def __init__(self, verification_code: str, code: str, message: str) -> None:

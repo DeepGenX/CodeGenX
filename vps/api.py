@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import secrets
 import smtplib
 import threading
@@ -127,6 +128,10 @@ async def generate(request: GenerationRequest):
 
 @app.post("/register")
 async def register(request: RegistrationRequest):
+    # Check if the given email is a valid email
+    if not re.match(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", request.email):
+        return create_response(False, errors.EmailAddressInvalid(request.email))
+
     # If registration is disabled
     if not ALLOW_REGISTRATION:
         return create_response(False, errors.RegistrationNotAllowed())
@@ -136,7 +141,12 @@ async def register(request: RegistrationRequest):
         return create_response(False, errors.EmailAlreadyUsed(request.email))
     
     # Send a verification email
-    send_email(request.email, "Verify your email address", f"Click the following url to verify your email address: {create_verification_url(request.email)}.\n\nIf you did not request this email you can just ignore it.")
+    try:
+        send_email(request.email, "Verify your email address", f"Click the following url to verify your email address: {create_verification_url(request.email)}.\n\nIf you did not request this email you can just ignore it.")
+    except errors.EmailVerificationAlreadySent as e:
+        return create_response(False, e)
+
+    return create_response(True, "Please verify your email.")
 
 @app.get("/verify/")
 async def verify(code: str):
