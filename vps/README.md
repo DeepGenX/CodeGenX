@@ -24,3 +24,4 @@ When something goes wrong the error value will be set, here is a list of what ev
 
 ### Misc:
 - Token format: {Hash function used}.{64 Random characters}.{Hashed email}
+- The path to the token file should be stored in an environment variable called `CODEGENX_TOKEN_FILE` and the email and password used to verify users should be in an environment variable called `CODEGENX_EMAIL` and `CODEGENX_EMAIL_PASS`
