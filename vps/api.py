@@ -1,6 +1,7 @@
-from os import error
-import errors
 import json
+import os
+import secrets
+import smtplib
 import threading
 import time
 from typing import *
@@ -9,10 +10,18 @@ import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+import errors
 from gpt_output import *
 from logger import Level, Logger
 from text_processing import *
 from token_manager import TokenManager
+
+ALLOW_REGISTRATION = True
+VERIFY_TIME = 15 * 60 # 15 Minutes
+
+email_server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+email_server.ehlo()
+email_server.login(os.environ.get("CODEGENX_EMAIL_ADDRESS"), os.environ.get("CODEGENX_EMAIL_PASSWORD"))
 
 class GenerationRequest(BaseModel):
     token: str
@@ -27,23 +36,6 @@ class RegistrationRequest(BaseModel):
 
 app = FastAPI()
 logger = Logger(__name__)
-
-config = {}
-def update_config() -> None:
-    global config
-
-    while True:
-        try:
-            with open("config.json", "r") as f:
-                new = json.load(f)
-                if config != new:
-                    config = new
-            
-            time.sleep(1)
-        except:
-            logger.log(Level.WARNING, "Failed to read config file.")
-
-            time.sleep(3)
 
 def create_response(success: bool, error_or_message: Optional[Union[errors.Error, str]] = None) -> dict:
     if success:
@@ -62,8 +54,34 @@ def generate_output(processed_input: str, parameters: dict, request: GenerationR
     
     return processed_blocks
 
-def send_token(token: str, email: str) -> None:
-    ... # TODO: Write this function
+sent_emails = {}
+def send_email(address: str, subject: str, content: str) -> None:
+    now = time.time()
+    if address in sent_emails:
+        if now - sent_emails[address] < VERIFY_TIME:
+            raise errors.EmailVerificationAlreadySent(address)
+    sent_emails[address] = now
+
+    email_server.sendmail(email_server.user, address, f"Subject: {subject}\n\n{content}")
+
+verification_codes = {}
+def create_verification_url(email: str) -> str:
+    code = secrets.token_hex(32)
+    verification_codes[code] = email
+    threading.Thread(target=delete_verification_code, args=(code,), daemon=True).start()
+    logger.log(Level.INFO, f"Created verification code \"{code}\" for email \"{email}\".")
+    return f"http://{config['host']}:{config['port']}/verify?code={code}"
+
+def delete_verification_code(code: str) -> None:
+    time.sleep(VERIFY_TIME)
+    if code in verification_codes:
+        verification_codes.pop(code)
+        logger.log(Level.INFO, f"Verification code \"{code}\" timed out.")
+
+def cooldown_loop() -> None:
+    while True:
+        time.sleep(60)
+        token_manager.update_all_cooldowns()
 
 @app.post("/generate")
 async def generate(request: GenerationRequest):
@@ -109,24 +127,36 @@ async def generate(request: GenerationRequest):
 
 @app.post("/register")
 async def register(request: RegistrationRequest):
+    # If registration is disabled
+    if not ALLOW_REGISTRATION:
+        return create_response(False, errors.RegistrationNotAllowed())
+
     # If the email has already been used
-    try:
-        token = token_manager.add_token(request.email)
-        send_token(token, request.email)
-        return create_response(True, f"Token sent to {request.email}.")
-    except errors.EmailAlreadyUsed as e:
-        return create_response(False, e)
+    if token_manager.get_token(request.email) != None:
+        return create_response(False, errors.EmailAlreadyUsed(request.email))
+    
+    # Send a verification email
+    send_email(request.email, "Verify your email address", f"Click the following url to verify your email address: {create_verification_url(request.email)}.\n\nIf you did not request this email you can just ignore it.")
+
+@app.get("/verify/")
+async def verify(code: str):
+    # If the verification code isn't valid
+    if code not in verification_codes:
+        return create_response(False, errors.InvalidVerificationCode(code))
+    email = verification_codes.pop(code)
+
+    logger.log(Level.INFO, f"Verified email \"{email}\" using verification code \"{code}\".")
+
+    return token_manager.add_token(email)
 
 if __name__ == "__main__":
-    # Starting a thread to update the config when it changes
-    thread = threading.Thread(target=update_config, daemon=True)
-    thread.start()
-
     # Reading the config file
     with open("config.json", "r") as f:
         config = json.load(f)
 
     # Creating a token manager
-    token_manager = TokenManager(config["token_path"])
+    token_manager = TokenManager(os.environ.get("CODEGENX_TOKEN_FILE"))
+
+    threading.Thread(target=cooldown_loop, daemon=True).start()
 
     uvicorn.run(app, host=config["host"], port=config["port"], log_level="info")

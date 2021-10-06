@@ -59,7 +59,31 @@ class TokenAlreadyExistsError(TokenError):
     def __init__(self, token: str) -> None:
         super().__init__(token, "TOKEN_ALREADY_EXISTS", f"token \"{token}\" already exists")
 
-# Misc errors
-class EmailAlreadyUsed(Error):
+# Email errors
+class EmailError(Error):
+    def __init__(self, email: str, code: str, message: str) -> None:
+        super().__init__(code, message)
+        self.email = email
+
+class EmailAlreadyUsed(EmailError):
     def __init__(self, email: str) -> None:
-        super().__init__("EMAIL_ALREADY_USED", f"email \"{email}\" has already been used")
+        super().__init__(email, "EMAIL_ALREADY_USED", f"email \"{email}\" has already been used")
+
+class EmailVerificationAlreadySent(EmailError):
+    def __init__(self, email: str) -> None:
+        super().__init__(email, "EMAIL_VERIFICATION_ALREADY_SENT", f"a verification email has already been sent to \"{email}\"")
+
+# Verification errors
+class VerificationError(Error):
+    def __init__(self, verification_code: str, code: str, message: str) -> None:
+        super().__init__(code, message)
+        self.verification_code = verification_code
+
+class InvalidVerificationCode(VerificationError):
+    def __init__(self, verification_code: str) -> None:
+        super().__init__(verification_code, "INVALID_VERIFICATION_CODE", f"verification code \"{verification_code}\" is not valid")
+
+# Misc errors
+class RegistrationNotAllowed(Error):
+    def __init__(self) -> None:
+        super().__init__("REGISTRATION_NOT_ALLOWED", "registration of new accounts is currently disabled")
