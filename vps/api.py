@@ -2,7 +2,6 @@ import json
 import os
 import re
 import secrets
-import smtplib
 import threading
 import time
 from typing import *
@@ -12,17 +11,18 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 import errors
+from email_server import EmailServer
 from gpt_output import *
 from logger import Level, Logger
 from text_processing import *
 from token_manager import TokenManager
 
 ALLOW_REGISTRATION = True
-VERIFY_TIME = 15 * 60 # 15 Minutes
+VERIFY_TIME = 15 * 60 # 15 Give the user 15 minutes to verify
 
-email_server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
-email_server.ehlo()
-email_server.login(os.environ.get("CODEGENX_EMAIL_ADDRESS"), os.environ.get("CODEGENX_EMAIL_PASSWORD"))
+# Setting up the email server
+sent_emails = {}
+email_server = EmailServer(os.environ.get("CODEGENX_EMAIL_ADDRESS"), os.environ.get("CODEGENX_EMAIL_PASSWORD"))
 
 class GenerationRequest(BaseModel):
     token: str
@@ -54,16 +54,6 @@ def generate_output(processed_input: str, parameters: dict, request: GenerationR
     processed_blocks = process_blocks(processed_output, count_leading_spaces(request.input.splitlines()[-1]), COMMENTS[request.language])
     
     return processed_blocks
-
-sent_emails = {}
-def send_email(address: str, subject: str, content: str) -> None:
-    now = time.time()
-    if address in sent_emails:
-        if now - sent_emails[address] < VERIFY_TIME:
-            raise errors.EmailVerificationAlreadySent(address)
-    sent_emails[address] = now
-
-    email_server.sendmail(email_server.user, address, f"Subject: {subject}\n\n{content}")
 
 verification_codes = {}
 def create_verification_url(email: str) -> str:
@@ -142,11 +132,11 @@ async def register(request: RegistrationRequest):
     
     # Send a verification email
     try:
-        send_email(request.email, "Verify your email address", f"Click the following url to verify your email address: {create_verification_url(request.email)}.\n\nIf you did not request this email you can just ignore it.")
+        email_server.send_email(request.email, "Verify your email address", f"Click the following url to verify your email address: {create_verification_url(request.email)}.\n\nIf you did not request this email you can just ignore it.")
     except errors.EmailVerificationAlreadySent as e:
         return create_response(False, e)
 
-    return create_response(True, "Please verify your email.")
+    return create_response(True, "A verification email has been sent.")
 
 @app.get("/verify/")
 async def verify(code: str):
