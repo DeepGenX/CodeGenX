@@ -24,8 +24,8 @@ CodeGenX is an AI powered code-completion tool with focus on Python and Javascri
   - Setup TPU's with GPT-J ⬜
   - Start fine-tuning and save model ⬜
 - VPS
-  - Setup VPS and API ⬜
-  - Setup token system and API limit. ⬜
+  - Setup VPS and API ✅
+  - Setup token system and API limit. ✅
 - Website for CodeGenX 
   - Setup simple website to show off CodeGenX ⬜
 
