@@ -76,7 +76,7 @@ function activate(context) {
 				const result = await axios.post(`http://api.vicgalle.net:5000/generate`, null, {params: payload});
 				const content = getGPTText(result.data.text);
 
-				return content;
+				return content + "\n" + getSOText(result.data.text);
 			} catch (err) {
 				console.log('Error sending request', err);
 				return 'There was an error sending the request\n' + err;
@@ -115,6 +115,14 @@ function activate(context) {
 			content += splitted_text[i]; //Display the entire function in the ClonePilot window
 			if (i < splitted_text.length - 1) content += '\n\n';
 		}
+		return content;
+	}
+
+	const getSOText = (text) => {
+		let content = `/* Stack Overflow Answers */\n\n`;
+
+		// Do stuff
+
 		return content;
 	}
 
