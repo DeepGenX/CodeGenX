@@ -62,7 +62,7 @@
 					},
 					"Codegenx.Top_P": {
 						"type": "number",
-						"default": 0.9,
+						"default": 0.7,
 						"description": "The top_p parameter of the GPT-J model"
 					},
 					"Codegenx.Top_K": {
