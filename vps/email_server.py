@@ -30,6 +30,7 @@ class EmailServer:
         self.__sent_emails[address] = now
 
         # Create the email (https://stackoverflow.com/questions/920910/sending-multipart-html-emails-which-contain-embedded-images)
+        # TODO: Clean this function (remove unnecessary code)
         message = MIMEMultipart("related")
         message["Subject"] = subject
         message["From"] = self.__server.user
