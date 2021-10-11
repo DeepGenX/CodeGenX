@@ -10,15 +10,12 @@ import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-import errors
+import api_constants, errors
 from email_server import EmailServer
 from gpt_output import *
 from logger import Level, Logger
 from text_processing import *
 from token_manager import TokenManager
-
-ALLOW_REGISTRATION = True
-VERIFY_TIME = 15 * 60 # 15 Give the user 15 minutes to verify
 
 # Setting up the email server
 sent_emails = {}
@@ -64,7 +61,7 @@ def create_verification_url(email: str) -> str:
     return f"http://{config['host']}:{config['port']}/verify?code={code}"
 
 def delete_verification_code(code: str) -> None:
-    time.sleep(VERIFY_TIME)
+    time.sleep(api_constants.VERIFY_TIME)
     if code in verification_codes:
         verification_codes.pop(code)
         logger.log(Level.INFO, f"Verification code \"{code}\" timed out.")
@@ -123,7 +120,7 @@ async def register(request: RegistrationRequest):
         return create_response(False, errors.EmailAddressInvalid(request.email))
 
     # If registration is disabled
-    if not ALLOW_REGISTRATION:
+    if not api_constants.ALLOW_REGISTRATION:
         return create_response(False, errors.RegistrationNotAllowed())
 
     # If the email has already been used
