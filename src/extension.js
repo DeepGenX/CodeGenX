@@ -4,6 +4,7 @@ const fs = require('fs');
 const {
 	URLSearchParams
 } = require('url');
+const search = require("./utils/search");
 
 
 // Accessing settings from vscode:
@@ -17,7 +18,7 @@ const stop_sequence = String(configuration.get('Codegenx.StopSequence', {}));
 const enable_selection = Boolean(configuration.get('Codegenx.EnableSelection', {}));
 
 // Converting token_max_length from string to length (128 (fast) -> 128):
-const token_max_length = parseInt(token_max_length_str.slice(0,3))
+const token_max_length = parseInt(token_max_length_str.slice(0, 3))
 console.log("token_max_length:", token_max_length)
 
 // The comment proxy whcih replaces the hashtag (#)
@@ -37,15 +38,15 @@ function activate(context) {
 
 		const document = editor.document;
 		let selection;
-		if(enable_selection && !editor.selection.isEmpty) {
+		if (enable_selection && !editor.selection.isEmpty) {
 			selection = editor.selection;
 			console.log(document.getText(selection))
 			selected_text = true;
 		}
 
 		else if (editor.selection.isEmpty || !enable_selection) { //If nothing is highlited, get the word at the cursor;
-  			const cursorPosition = editor.selection.active;
-			selection = new vscode.Selection(0,0,cursorPosition.line, cursorPosition.character);
+			const cursorPosition = editor.selection.active;
+			selection = new vscode.Selection(0, 0, cursorPosition.line, cursorPosition.character);
 			console.log(document.getText(selection))
 			selected_text = false;
 		}
@@ -53,7 +54,7 @@ function activate(context) {
 		selectedEditor = editor; //Save to be used when the completion is inserted
 		selectedRange = selection;
 
-		console.log("selected_text:",selected_text)
+		console.log("selected_text:", selected_text)
 		var word = document.getText(selection); //The word in the selection
 		word = word.replaceAll("#", comment_proxy);
 		await open_CodeGenX(word.trim());
@@ -71,12 +72,45 @@ function activate(context) {
 
 			try {
 				word = word.replaceAll(comment_proxy, "#");
-				const payload = { 'context': word, 'token_max_length': token_max_length, 'temperature': temp, 'top_p': top_p, 'top_k': top_k, 'stop_sequence':stop_sequence};
+				const payload = { 'context': word, 'token_max_length': token_max_length, 'temperature': temp, 'top_p': top_p, 'top_k': top_k, 'stop_sequence': stop_sequence };
 
-				const result = await axios.post(`http://api.vicgalle.net:5000/generate`, null, {params: payload});
-				const content = getGPTText(result.data.text);
+				// TODO: Move to the vps
+				const result = await axios.post(`http://api.vicgalle.net:5000/generate`, null, { params: payload });
+				var content = getGPTText(result.data.text);
 
-				return content + "\n" + getSOText(result.data.text);
+				const lines = word.trimRight().split("\n");
+				const last_line = lines[lines.length - 1].trimLeft();
+
+				// TODO: Figure out a way to solve this
+				/*
+				import numpy as np
+				import pandas as pd
+
+				def doStuff():
+					// this shouldn't work
+				*/
+				
+				// Check whether the document ends with a comment
+				var ends_with_comment = false;
+				ends_with_comment = true;
+				for (var comment in ["#", "//"]) {
+					if (last_line.startsWith(comment)) {
+						ends_with_comment = true;
+						break;
+					}
+				}
+
+				const soText = await getSOText(last_line);
+
+				console.log(ends_with_comment);
+				console.log(soText);
+				
+				// If the document ends with a comment, add the stack overflow answers
+				if (ends_with_comment) {
+					content += "\n\n================================\n\n" + soText;
+				}
+
+				return content;
 			} catch (err) {
 				console.log('Error sending request', err);
 				return 'There was an error sending the request\n' + err;
@@ -118,10 +152,12 @@ function activate(context) {
 		return content;
 	}
 
-	const getSOText = (text) => {
+	const getSOText = async (comment_line) => {
 		let content = `/* Stack Overflow Answers */\n\n`;
 
-		// Do stuff
+		console.log("Comment: " + comment_line);
+
+		content += await search.search(comment_line);
 
 		return content;
 	}
@@ -138,7 +174,7 @@ function activate(context) {
 			if (element == "") {
 				continue
 			}
-			if(!scope && !comment_scope) {
+			if (!scope && !comment_scope) {
 				if (element.startsWith("def") || element.startsWith("class")) {
 					if (temp != "" && !element.startsWith("@")) {
 						result.push(temp);
@@ -148,7 +184,7 @@ function activate(context) {
 					temp += "\n";
 					scope = true;
 					continue;
-				} else if(element.startsWith("#")) {
+				} else if (element.startsWith("#")) {
 					if (temp != "") {
 						result.push(temp);
 						temp = "";
@@ -164,7 +200,7 @@ function activate(context) {
 					temp += element;
 					temp += "\n";
 					continue
-				} else if(element.startsWith("def") || element.startsWith("class") || element.startsWith("@")) {
+				} else if (element.startsWith("def") || element.startsWith("class") || element.startsWith("@")) {
 					if (temp.startsWith("@")) {
 						temp += element;
 						temp += "\n";
@@ -181,8 +217,8 @@ function activate(context) {
 					temp += "\n";
 					continue
 				}
-			} else if(comment_scope) {
-				if(element.startsWith("def") || element.startsWith("class") || element.startsWith("@") || element.startsWith("#")) {
+			} else if (comment_scope) {
+				if (element.startsWith("def") || element.startsWith("class") || element.startsWith("@") || element.startsWith("#")) {
 					comment_scope = false;
 					result.push(temp);
 					temp = element;
@@ -197,7 +233,7 @@ function activate(context) {
 			temp += element;
 			temp += "\n"
 		}
-		if(temp != "") {
+		if (temp != "") {
 			result.push(temp)
 		}
 		for (const element of result) {
@@ -218,7 +254,7 @@ function activate(context) {
 
 				editBuilder.replace(s, fn) //Insert the function into the text
 			}).then(success => {
-				var postion = selectedEditor.selection.end; 
+				var postion = selectedEditor.selection.end;
 				selectedEditor.selection = new vscode.Selection(postion, postion);
 			});
 		} catch (e) {
@@ -256,7 +292,7 @@ function activate(context) {
 	}, codelensProvider));
 }
 
-function deactivate() {}
+function deactivate() { }
 
 module.exports = {
 	activate,
