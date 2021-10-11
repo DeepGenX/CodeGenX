@@ -63,8 +63,3 @@ class EmailServer:
 
         # Send the email
         self.__server.sendmail(self.__server.user, address, message.as_string())
-
-# TESTING
-if __name__ == "__main__":
-    server = EmailServer("deepgenx.noreply@gmail.com", "tenniis@1234")
-    server.send_email("matthiasx95@gmail.com", "Verify your email address", f"Click the following url to verify your email address: URL.\n\nIf you did not request this email you can just ignore it.")
