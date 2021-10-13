@@ -1,5 +1,5 @@
 ### Code generation:
-To generate output for a given input, send a post request to http://ADDRESS:PORT/generate and specify these parameters:
+To generate output for a given input, send a post request to http://ADDRESS:PORT/generate and specify these parameters (NOTE: Don't set defaults in the extensions themselves because if we want to change a default value, we'd have to change it in the extension for every IDE instead of just once on the VPS):
 - token: The token to authenticate the request
 - input: The code that the user has written so far (from the start of the document to the line that the cursor is on, including that line)
 - language: The language that the code is being written in, use the extension of the file (examples: C++ would be cpp, C# would be cs, Python would be py, JavaScript would be js, etc.)
