@@ -5,7 +5,8 @@ import secrets
 import errors
 import pickle
 
-REQUESTS_PER_MINUTE = 5
+import api_constants
+
 HASH_FUNCTION = hashlib.sha256
 
 def generate_token(email: str) -> str:
@@ -95,7 +96,7 @@ class TokenManager:
 		self.__store_tokens()
 	
 	def update_cooldown(self, token: str) -> None:
-		self.cooldowns[token] = REQUESTS_PER_MINUTE
+		self.cooldowns[token] = api_constants.REQUESTS_PER_MINUTE
 
 	def update_all_cooldowns(self) -> None:
 		for token in self.tokens:
