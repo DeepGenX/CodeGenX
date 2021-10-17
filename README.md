@@ -22,7 +22,8 @@ CodeGenX is an AI powered code-completion tool with focus on Python and Javascri
   - Clean data -> remove useless code, filter minified javascript ✅
   - Convert data to TFRecord format ✅
   - Setup TPU's with GPT-J ✅
-  - Start fine-tuning and save model ⬜
+  - Start fine-tuning 
+  - Save model ⬜
 - VPS
   - Setup VPS and API ✅
   - Setup token system and API limit. ✅
