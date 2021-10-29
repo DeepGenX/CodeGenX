@@ -12,6 +12,7 @@ const {
 } = require('url');
 const { config } = require('process');
 
+const website = "https://deepgenx.com/codegenx"
 
 // Accessing settings from vscode:
 const currentDocument = vscode.window.activeTextEditor.document;
@@ -33,16 +34,11 @@ async function activate(context) {
 	let selectedEditor; //The editor to insert the completion into
 	let selected_text;
 
-	vscode.window.showInformationMessage("Token length: " + token.length);
+	// vscode.window.showInformationMessage("Token length: " + token.length);
 
 	if (token == "")
 	{
-		const email = await vscode.window.showInputBox({prompt: "Please enter your email to use CodeGenX:", title: "Enter your email", ignoreFocusOut: true});
-		await axios.post("https://api.deepgenx.com/register", {"email": email});
-
-		const inputtedToken = await vscode.window.showInputBox({prompt: "Enter the token you received:", title: "Enter your token", ignoreFocusOut: true});
-
-		configuration.update("Codegenx.Token", inputtedToken); // TODO: Figure out how to actually set the token in the config cause rn it seems to clear everytime you relaunch
+		vscode.window.showInformationMessage("It looks like you do not have an API token. You can go to "+website+" for instructions on how to get one.")
 	}
 
 	//A command to open the ClonePilot window
