@@ -1,3 +1,9 @@
+/* TODO LIST
+- Display errors when the api returns an error
+- Clean up this code
+*/
+
+
 const vscode = require('vscode');
 const axios = require('axios');
 const fs = require('fs');
@@ -11,13 +17,12 @@ const currentDocument = vscode.window.activeTextEditor.document;
 const configuration = vscode.workspace.getConfiguration('', currentDocument.uri);
 const temp = Number(configuration.get('Codegenx.Temperature', {}));
 const top_p = Number(configuration.get('Codegenx.Top_P', {}));
-const top_k = Number(configuration.get('Codegenx.Top_K', {}));
+const token = String(configuration.get('Codegenx.Token', {}));
 const token_max_length_str = String(configuration.get('Codegenx.MaxLength', {}));
-const stop_sequence = String(configuration.get('Codegenx.StopSequence', {}));
 const enable_selection = Boolean(configuration.get('Codegenx.EnableSelection', {}));
 
 // Converting token_max_length from string to length (128 (fast) -> 128):
-const token_max_length = parseInt(token_max_length_str.slice(0,3))
+const token_max_length = parseInt(token_max_length_str)
 console.log("token_max_length:", token_max_length)
 
 // The comment proxy whcih replaces the hashtag (#)
@@ -53,10 +58,12 @@ function activate(context) {
 		selectedEditor = editor; //Save to be used when the completion is inserted
 		selectedRange = selection;
 
+		var language = document.languageId; // TODO: Write this line (python should be py and javascript should be js, so just use the file extension and raise an error that codegenx cant generate code for files without a file extension if the user tries to generate text for a file without extension)
+
 		console.log("selected_text:",selected_text)
 		var word = document.getText(selection); //The word in the selection
 		word = word.replaceAll("#", comment_proxy);
-		await open_CodeGenX(word.trim());
+		await open_CodeGenX(word.trim(), language);
 
 	}));
 
@@ -64,17 +71,19 @@ function activate(context) {
 	const textDocumentProvider = new class { //Provides a text document for the window
 		async provideTextDocumentContent(uri) {
 			const params = new URLSearchParams(uri.query);
-			var word = params.get('word');
 			if (params.get('loading') === 'true') {
 				return `/* CodeGenX is generating the output */\n`;
 			}
 
+			var word = params.get('word');
+			var language = params.get('lang');
+
 			try {
 				word = word.replaceAll(comment_proxy, "#");
-				const payload = { 'context': word, 'token_max_length': token_max_length, 'temperature': temp, 'top_p': top_p, 'top_k': top_k, 'stop_sequence':stop_sequence};
+				const payload = { 'input': word, 'max_length': token_max_length, 'temperature': temp, 'top_p': top_p, 'token': token, 'language': language};
 
-				const result = await axios.post(`http://api.vicgalle.net:5000/generate`, null, {params: payload});
-				const content = getGPTText(result.data.text);
+				const result = await axios.post(`http://api.deepgenx.com:5700/generate`, null, {params: payload});
+				const content = getGPTText(result.data.message);
 
 				return content + "\n" + getSOText(result.data.text);
 			} catch (err) {
@@ -86,11 +95,11 @@ function activate(context) {
 	context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(myScheme, textDocumentProvider));
 
 	//Open the ClonePilot window to display the functions
-	const open_CodeGenX = async (word) => {
+	const open_CodeGenX = async (word, language) => {
 		//A uri to send to the document
-		let loadingUri = vscode.Uri.parse(`${myScheme}:Clone Pilot?word=${word}&loading=true`, true);
+		let loadingUri = vscode.Uri.parse(`${myScheme}:Clone Pilot?word=${word}&lang=${language}&loading=true`, true);
 		await showUri(loadingUri); //Open a loading window
-		let uri = vscode.Uri.parse(`${myScheme}:Clone Pilot?word=${word}&loading=false`, true);
+		let uri = vscode.Uri.parse(`${myScheme}:Clone Pilot?word=${word}&lang=${language}&loading=false`, true);
 		//TODO If the uri has already been loaded, the codelense breaks
 		await showUri(uri); //Show the actual content, once got from the server
 	}
@@ -108,7 +117,7 @@ function activate(context) {
 	const getGPTText = (text) => {
 		codelensProvider.clearPositions();
 		let content = `/* CodeGenX is suggesting the following */\n\n`;
-		let splitted_text = splitCode(text);
+		let splitted_text = eval(text);
 		for (let i = 0; i < splitted_text.length; i++) {
 			const lineNum = content.split('\n').length; //The line to insert the codelens on
 			codelensProvider.addPosition(lineNum, splitted_text[i]); //Add a codelens on that line
@@ -124,89 +133,6 @@ function activate(context) {
 		// Do stuff
 
 		return content;
-	}
-
-	const splitCode = (text) => {
-		var splitted = text.replace(/    /g, "\t").split(/\n\s*\n/);
-		var result = [];
-		var final_result = [];
-		var temp = "";
-		var scope = false;
-		var comment_scope = false;
-
-		for (const element of splitted) {
-			if (element == "") {
-				continue
-			}
-			if(!scope && !comment_scope) {
-				if (element.startsWith("def") || element.startsWith("class")) {
-					if (temp != "" && !element.startsWith("@")) {
-						result.push(temp);
-						temp = "";
-					}
-					temp += element;
-					temp += "\n";
-					scope = true;
-					continue;
-				} else if(element.startsWith("#")) {
-					if (temp != "") {
-						result.push(temp);
-						temp = "";
-					}
-					temp += element;
-					temp += "\n";
-					comment_scope = true;
-					continue
-				}
-			}
-			if (scope) {
-				if (element.startsWith("\t")) {
-					temp += element;
-					temp += "\n";
-					continue
-				} else if(element.startsWith("def") || element.startsWith("class") || element.startsWith("@")) {
-					if (temp.startsWith("@")) {
-						temp += element;
-						temp += "\n";
-						continue
-					}
-					result.push(temp);
-					temp = element;
-					temp += "\n";
-					continue
-				} else {
-					scope = false;
-					result.push(temp);
-					temp = element;
-					temp += "\n";
-					continue
-				}
-			} else if(comment_scope) {
-				if(element.startsWith("def") || element.startsWith("class") || element.startsWith("@") || element.startsWith("#")) {
-					comment_scope = false;
-					result.push(temp);
-					temp = element;
-					temp += "\n";
-					continue
-				} else {
-					temp += element;
-					temp += "\n";
-					continue
-				}
-			}
-			temp += element;
-			temp += "\n"
-		}
-		if(temp != "") {
-			result.push(temp)
-		}
-		for (const element of result) {
-			if (!(element in ["\r\n", "\n\r", "\r", "\n", "\n\n"])) {
-				final_result.push(element);
-			}
-		}
-		console.log(final_result);
-		return final_result;
 	}
 
 	//When the user clicks on a codelens for a function
