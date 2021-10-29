@@ -140,7 +140,7 @@ async function activate(context) {
 	}
 
 	const getSOText = (text) => {
-		let content = `/* Stack Overflow Answers */\n\n`;
+		let content = `/* Stack Overflow Answers */\n\nWORK IN PROGRESS`;
 
 		// Do stuff
 
