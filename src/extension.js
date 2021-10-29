@@ -34,15 +34,13 @@ async function activate(context) {
 	let selectedEditor; //The editor to insert the completion into
 	let selected_text;
 
-	// vscode.window.showInformationMessage("Token length: " + token.length);
-
-	if (token == "")
-	{
-		vscode.window.showInformationMessage("It looks like you do not have an API token. You can go to "+website+" for instructions on how to get one.")
-	}
-
 	//A command to open the ClonePilot window
 	context.subscriptions.push(vscode.commands.registerCommand('codegenx.open_CodeGenX', async () => {
+		if (token == "")
+		{
+			vscode.window.showInformationMessage(`It looks like you do not have an API token. You can go to ${website} for instructions on how to get one.`);
+		}
+
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) {
 			vscode.window.showInformationMessage('Please open an editor to use CodeGenX.');
