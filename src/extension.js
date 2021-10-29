@@ -10,6 +10,7 @@ const fs = require('fs');
 const {
 	URLSearchParams
 } = require('url');
+const { config } = require('process');
 
 
 // Accessing settings from vscode:
@@ -28,9 +29,21 @@ console.log("token_max_length:", token_max_length)
 // The comment proxy whcih replaces the hashtag (#)
 const comment_proxy = "cgx_hashtag_comment"
 
-function activate(context) {
+async function activate(context) {
 	let selectedEditor; //The editor to insert the completion into
 	let selected_text;
+
+	vscode.window.showInformationMessage("Token length: " + token.length);
+
+	if (token == "")
+	{
+		const email = await vscode.window.showInputBox({prompt: "Please enter your email to use CodeGenX:", title: "Enter your email", ignoreFocusOut: true});
+		await axios.post("https://api.deepgenx.com/register", {"email": email});
+
+		const inputtedToken = await vscode.window.showInputBox({prompt: "Enter the token you received:", title: "Enter your token", ignoreFocusOut: true});
+
+		configuration.update("Codegenx.Token", inputtedToken); // TODO: Figure out how to actually set the token in the config cause rn it seems to clear everytime you relaunch
+	}
 
 	//A command to open the ClonePilot window
 	context.subscriptions.push(vscode.commands.registerCommand('codegenx.open_CodeGenX', async () => {
@@ -58,7 +71,10 @@ function activate(context) {
 		selectedEditor = editor; //Save to be used when the completion is inserted
 		selectedRange = selection;
 
-		var language = document.languageId;
+		var language = {
+			"python": "py",
+			"javascript": "js"
+		}[document.languageId]; // TODO: Figure out a way to actually get the extension and not just the language name
 
 		console.log("selected_text:",selected_text)
 		var word = document.getText(selection); //The word in the selection
@@ -82,7 +98,7 @@ function activate(context) {
 				word = word.replaceAll(comment_proxy, "#");
 				const payload = { 'input': word, 'max_length': token_max_length, 'temperature': temp, 'top_p': top_p, 'token': token, 'language': language};
 
-				const result = await axios.post(`http://api.deepgenx.com:5700/generate`, null, {params: payload});
+				const result = await axios.post(`https://api.deepgenx.com/generate`, payload);
 				const content = getGPTText(result.data.message);
 
 				return content + "\n" + getSOText(result.data.text);

@@ -65,11 +65,6 @@
 						"default": 0.7,
 						"description": "The top_p parameter of the GPT-J model"
 					},
-					"Codegenx.Top_K": {
-						"type": "number",
-						"default": 40,
-						"description": "The top_k parameter of the GPT-J model"
-					},
 					"Codegenx.MaxLength": {
 						"type": "string",
 						"enum": [
@@ -78,17 +73,11 @@
 							"512 (slow)"
 						],
 						"default": "128 (fast)",
-						"description": "The Max length of the output. The longer the output the slower the inference."
+						"description": "The max length of the output. The longer the output the slower the inference."
 					},
-					"Codegenx.EnableSelection": {
-						"type": "boolean",
-						"default": true,
-						"description": "Option to generate output for text which is selected."
-					},
-					"Codegenx.StopSequence": {
+					"Codegenx.Token": {
 						"type": "string",
-						"default": "<|endoftext|>",
-						"description": "The stop_sequence parameter of the GPT-J model"
+						"description": "The token used to make API calls."
 					}
 				}
 			}
