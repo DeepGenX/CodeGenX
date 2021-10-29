@@ -58,7 +58,7 @@ function activate(context) {
 		selectedEditor = editor; //Save to be used when the completion is inserted
 		selectedRange = selection;
 
-		var language = document.languageId; // TODO: Write this line (python should be py and javascript should be js, so just use the file extension and raise an error that codegenx cant generate code for files without a file extension if the user tries to generate text for a file without extension)
+		var language = document.languageId;
 
 		console.log("selected_text:",selected_text)
 		var word = document.getText(selection); //The word in the selection
