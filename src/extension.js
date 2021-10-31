@@ -100,8 +100,6 @@ async function activate(context) {
 					// vscode.window.showErrorMessage(result.data.error.message);
 					return result.data.error.message;
 				}
-
-				return content + "\n" + getSOText(result.data.text);
 			} catch (err) {
 				console.log('Error sending request', err);
 				return 'There was an error sending the request\n' + err;
