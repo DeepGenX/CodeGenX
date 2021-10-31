@@ -24,8 +24,8 @@ const token_max_length_str = String(configuration.get('Codegenx.MaxLength', {}))
 const enable_selection = Boolean(configuration.get('Codegenx.EnableSelection', {}));
 
 // Converting token_max_length from string to length (128 (fast) -> 128):
-const token_max_length = parseInt(token_max_length_str)
-console.log("token_max_length:", token_max_length)
+const token_max_length = parseInt(token_max_length_str);
+console.log("token_max_length:", token_max_length);
 
 // The comment proxy whcih replaces the hashtag (#)
 const comment_proxy = "cgx_hashtag_comment"
@@ -36,9 +36,9 @@ async function activate(context) {
 
 	//A command to open the ClonePilot window
 	context.subscriptions.push(vscode.commands.registerCommand('codegenx.open_CodeGenX', async () => {
-		if (token == "")
-		{
+		if (token == "") {
 			vscode.window.showInformationMessage(`It looks like you do not have an API token. You can go to ${website} for instructions on how to get one.`);
+			return;
 		}
 
 		const editor = vscode.window.activeTextEditor;
@@ -93,7 +93,13 @@ async function activate(context) {
 				const payload = { 'input': word, 'max_length': token_max_length, 'temperature': temp, 'top_p': top_p, 'token': token, 'language': language};
 
 				const result = await axios.post(`https://api.deepgenx.com/generate`, payload);
-				const content = getGPTText(result.data.message);
+
+				if (result.data.success) {
+					return getGPTText(result.data.message) + "\n" + getSOText(word);
+				} else {
+					// vscode.window.showErrorMessage(result.data.error.message);
+					return result.data.error.message;
+				}
 
 				return content + "\n" + getSOText(result.data.text);
 			} catch (err) {
