@@ -33,3 +33,6 @@ CodeGenX is an AI powered code-completion tool with focus on Python and Javascri
 ## We need your help!
 In order to make CodeGenX a real thing in the near future, we happily welcome any help offered.
 Join our Discord: https://discord.gg/4NccXcKGZQ 
+
+## Acknowledgements ✨
+Many thanks to the support of the [Google TPU Research Cloud](https://sites.research.google/trc/) for providing the precious compute resources!
