@@ -5,7 +5,6 @@
 
 const vscode = require('vscode');
 const axios = require('axios');
-const fs = require('fs');
 const {
 	URLSearchParams
 } = require('url');
@@ -45,28 +44,15 @@ async function activate(context) {
 
 		const document = editor.document;
 		let selection;
-		if(enable_selection && !editor.selection.isEmpty) {
-			selection = editor.selection;
-			console.log(document.getText(selection))
-			selected_text = true;
-		}
 
-		else if (editor.selection.isEmpty || !enable_selection) { //If nothing is highlited, get the word at the cursor;
-  			const cursorPosition = editor.selection.active;
-			selection = new vscode.Selection(0,0,cursorPosition.line, cursorPosition.character);
-			console.log(document.getText(selection))
-			selected_text = false;
-		}
+		const cursorPosition = editor.selection.active;
+		selection = new vscode.Selection(0, 0, cursorPosition.line, cursorPosition.character);
+		console.log(document.getText(selection))
 
 		selectedEditor = editor; //Save to be used when the completion is inserted
 		selectedRange = selection;
 
-		var language = {
-			"python": "py",
-			"javascript": "js"
-		}[document.languageId]; // TODO: Figure out a way to actually get the extension and not just the language name
 
-		console.log("selected_text:",selected_text)
 		var word = document.getText(selection); //The word in the selection
 		word = word.replaceAll("#", comment_proxy);
 		await open_CodeGenX(word.trim(), language);
@@ -85,7 +71,7 @@ async function activate(context) {
 
 			try {
 				word = word.replaceAll(comment_proxy, "#");
-				const payload = { 'input': word, 'max_length': token_max_length, 'temperature': temp, 'token': token};
+				const payload = { 'input': word, 'max_length': token_max_length, 'temperature': temp, 'token': token };
 
 				const result = await axios.post(`http://api.deepgenx.com:5700/generate`, payload);
 
@@ -131,12 +117,14 @@ async function activate(context) {
 		let splitted_text = text[0];
 		for (let i = 0; i < splitted_text.length; i++) {
 			const lineNum = content.split('\n').length; //The line to insert the codelens on
-			if (i===0){
-			codelensProvider.addPosition(lineNum, splitted_text[i]);} //Add a codelens on that line
-			if (i!=0){
-				codelensProvider.addPosition(lineNum-1, splitted_text[i]);}
+			if (i === 0) {
+				codelensProvider.addPosition(lineNum, splitted_text[i]);
+			} //Add a codelens on that line
+			if (i != 0) {
+				codelensProvider.addPosition(lineNum - 1, splitted_text[i]);
+			}
 			content += splitted_text[i]; //Display the entire function in the CodeGenX window
-			if (i < splitted_text.length - 1) content += '\n\n'; 
+			if (i < splitted_text.length - 1) content += '\n\n';
 		}
 		return content;
 	}
@@ -158,7 +146,7 @@ async function activate(context) {
 
 				editBuilder.replace(s, fn) //Insert the function into the text
 			}).then(success => {
-				var postion = selectedEditor.selection.end; 
+				var postion = selectedEditor.selection.end;
 				selectedEditor.selection = new vscode.Selection(postion, postion);
 			});
 		} catch (e) {
@@ -196,7 +184,7 @@ async function activate(context) {
 	}, codelensProvider));
 }
 
-function deactivate() {}
+function deactivate() { }
 
 module.exports = {
 	activate,
