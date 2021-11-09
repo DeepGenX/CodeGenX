@@ -55,7 +55,7 @@ async function activate(context) {
 
 		var word = document.getText(selection); //The word in the selection
 		word = word.replaceAll("#", comment_proxy);
-		await open_CodeGenX(word.trim(), language);
+		await open_CodeGenX(word.trim());
 
 	}));
 
@@ -92,11 +92,11 @@ async function activate(context) {
 	context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(myScheme, textDocumentProvider));
 
 	//Open the CodeGenX window to display the functions
-	const open_CodeGenX = async (word, language) => {
+	const open_CodeGenX = async (word) => {
 		//A uri to send to the document
-		let loadingUri = vscode.Uri.parse(`${myScheme}:CodeGenX?word=${word}&lang=${language}&loading=true`, true);
+		let loadingUri = vscode.Uri.parse(`${myScheme}:CodeGenX?word=${word}&loading=true`, true);
 		await showUri(loadingUri); //Open a loading window
-		let uri = vscode.Uri.parse(`${myScheme}:CodeGenX?word=${word}&lang=${language}&loading=false`, true);
+		let uri = vscode.Uri.parse(`${myScheme}:CodeGenX?word=${word}&loading=false`, true);
 		//TODO If the uri has already been loaded, the codelense breaks
 		await showUri(uri); //Show the actual content, once got from the server
 	}
