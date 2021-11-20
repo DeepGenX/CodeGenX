@@ -43,7 +43,7 @@ At the core of CodeGenX lies a large neural network called [GPT-J](https://githu
 ## Installation and Additional Information 
 
 
-You can find installation instructions and additional information about CodeGenX on our [website](www.deepgenx.com) or read the complete documentation [here](www,docs.deepgenx.com).
+You can find installation instructions and additional information about CodeGenX on our [website](https://deepgenx.com) or read the complete documentation [here](https://docs.deepgenx.com).
 
 **note**: Links are currently inactive, will me public soon.
 
