@@ -5,7 +5,7 @@
 <!-- <img src="assets/hero-image.png" alt="CodeGenX Logo"> -->
 
 <p align="center">
-<img src="CodeGenX_demo.gif" width="600"/>
+<img src="CodeGenX_demo.gif" width="800"/>
 </p>
 
 CodeGenX is a Code Generation system powered by Artificial Intelligence! It is delivered to you in the form of a VsCode Extension and is **Free and Open-source**! 
