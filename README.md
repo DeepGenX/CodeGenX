@@ -8,7 +8,7 @@
 <img src="CodeGenX_demo.gif" width="800"/>
 </p>
 
-CodeGenX is a Code Generation system powered by Artificial Intelligence! It is delivered to you in the form of a VsCode Extension and is **Free and Open-source**! 
+CodeGenX is a Code Generation system powered by Artificial Intelligence! It is delivered to you in the form of a Visual Studio Code Extension and is **Free and Open-source**! 
 
 <br/>
 
@@ -16,7 +16,7 @@ CodeGenX is a Code Generation system powered by Artificial Intelligence! It is d
 
 You can find installation instructions and additional information about CodeGenX in the documentation [here](https://docs.deepgenx.com).
 
-**note**: Links are currently inactive, will be public soon.
+**Note**: Links are currently inactive, will be public soon.
 
 <br/>
 
