@@ -47,6 +47,24 @@ At the core of CodeGenX lies a large neural network called [GPT-J](https://githu
 <br/>
 
 
+## Contributors ✨
 
-## Contributors
+This project would not have been possible without the help of these wonderful people:
+
+<br/>
+
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/Aryagm"><img src="https://avatars.githubusercontent.com/u/80019072?v=4" width="100px;" alt=""/><br /><sub><b>Arya Manjaramkar</b></sub></a></td>
+    <td align="center"><a href="https://github.com/Matthias1590"><img src="https://avatars.githubusercontent.com/u/48327140?v=4" width="100px;" alt=""/><br /><sub><b>Matthias Wijnsma</b></sub></a><br /></td>
+    <td align="center"><a href="https://github.com/ThomasHoutrique"><img src="https://avatars.githubusercontent.com/u/30757539?v=4" width="100px;" alt=""/><br /><sub><b>Thomas Houtrique</b></sub></a><br /></td>
+    <td align="center"><a href="https://github.com/dome272"><img src="https://avatars.githubusercontent.com/u/61938694?v=4" width="100px;" alt=""/><br /><sub><b>Dominic Rampas</b></sub></td>
+    <td align="center"><a href="https://github.com/LelouBil"><img src="https://avatars.githubusercontent.com/u/13931833?v=4" width="100px;" alt=""/><br /><sub><b>Bilel Medimegh</b></sub></td>
+    <td align="center"><a href="https://github.com/orgs/DeepGenX/people/josh-hills"><img src="https://avatars.githubusercontent.com/u/57681652?v=4" width="100px;" alt=""/><br /><sub><b>Josh Hills</b></sub></td>
+    <td align="center"><a href="https://github.com/Simplyalex99"><img src="https://avatars.githubusercontent.com/u/42325851?v=4" width="100px;" alt=""/><br /><sub><b>Alex</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/timothebot"><img src="https://avatars.githubusercontent.com/u/65387160?v=4" width="100px;" alt=""/><br /><sub><b>Tiimo</b></sub></td>
+  </tr>
+</table>
 
