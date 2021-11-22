@@ -68,3 +68,6 @@ This project would not have been possible without the help of these wonderful pe
   </tr>
 </table>
 
+## Acknowledgements 
+
+Many thanks to the support of the [TPU Research Cloud](https://sites.research.google/trc/) for providing the precious compute needed for this project.
