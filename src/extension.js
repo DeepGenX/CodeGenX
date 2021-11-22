@@ -9,7 +9,7 @@ const {
 	URLSearchParams
 } = require('url');
 
-const website = "https://deepgenx.com/codegenx"
+const website = "https://docs.deepgenx.com"
 
 // Accessing settings from vscode:
 const currentDocument = vscode.window.activeTextEditor.document;
@@ -22,7 +22,7 @@ const enable_selection = Boolean(configuration.get('Codegenx.EnableSelection', {
 // Converting token_max_length from string to length (128 (fast) -> 128):
 const token_max_length = parseInt(token_max_length_str);
 
-// The comment proxy whcih replaces the hashtag (#)
+// The comment proxy which replaces the hashtag (#)
 const comment_proxy = "cgx_hashtag_comment"
 
 async function activate(context) {
@@ -73,7 +73,7 @@ async function activate(context) {
 				word = word.replaceAll(comment_proxy, "#");
 				const payload = { 'input': word, 'max_length': token_max_length, 'temperature': temp, 'token': token };
 
-				const result = await axios.post(`http://api.deepgenx.com:5700/generate`, payload);
+				const result = await axios.post(`https://api.deepgenx.com:5700/generate`, payload);
 
 				if (result.data.success) {
 
