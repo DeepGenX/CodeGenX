@@ -2,9 +2,11 @@
 - Display errors when the api returns an error
 - Clean up this code
 */
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const vscode = require('vscode');
 const axios = require('axios');
+const https = require('https');
 const {
 	URLSearchParams
 } = require('url');
@@ -72,8 +74,10 @@ async function activate(context) {
 			try {
 				word = word.replaceAll(comment_proxy, "#");
 				const payload = { 'input': word, 'max_length': token_max_length, 'temperature': temp, 'token': token };
-
-				const result = await axios.post(`https://api.deepgenx.com:5700/generate`, payload);
+				const agent = new https.Agent({  
+					rejectUnauthorized: false
+				  });
+				const result = await axios.post(`https://api.deepgenx.com:5700/generate`, payload, { httpsAgent: agent });
 
 				if (result.data.success) {
 
