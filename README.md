@@ -1,5 +1,7 @@
 # CodeGenX
 
+**Important Announcement**: We are currently in the process of migrating CodeGenX to more powerful hardware. This will improve inference time and make the service a lot faster. **CodeGenX will be temporarily inactive from the 28th of March 2022 for about one week.** The code generation will not work and new users won't be able to sign up during this period. The new hardware will also allow us to start working on a new and improved version of CodeGenX with more accurate generation capabilities! We apologize for the inconvenience.
+
 <br/>
 
 <!-- <img src="assets/hero-image.png" alt="CodeGenX Logo"> -->
