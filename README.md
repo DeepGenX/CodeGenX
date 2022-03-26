@@ -18,7 +18,6 @@ CodeGenX is a Code Generation system powered by Artificial Intelligence! It is d
 
 You can find installation instructions and additional information about CodeGenX in the documentation [here](https://docs.deepgenx.com).
 
-
 <br/>
 
 ## About CodeGenX
@@ -47,7 +46,6 @@ At the core of CodeGenX lies a large neural network called [GPT-J](https://githu
 
 <br/>
 
-
 ## Contributors ✨
 
 This project would not have been possible without the help of these wonderful people:
@@ -69,6 +67,6 @@ This project would not have been possible without the help of these wonderful pe
   </tr>
 </table>
 
-## Acknowledgements 
+## Acknowledgements
 
 Many thanks to the support of the Google TPU Research Cloud for providing the precious compute needed for this project.
