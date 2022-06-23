@@ -3,6 +3,8 @@
 **CodeGenX is back online! 🎉**
 _We are sorry for the long wait_
 
+Existing users will need to update the extension in VsCode and New users can sign up on our [website](https://deepgenx.com)
+
 <br/>
 
 <!-- <img src="assets/hero-image.png" alt="CodeGenX Logo"> -->
