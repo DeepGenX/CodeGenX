@@ -66,7 +66,32 @@ async function activate(context) {
 		async provideTextDocumentContent(uri) {
 			const params = new URLSearchParams(uri.query);
 
-			return "We are currently in the process of migrating CodeGenX to more powerful hardware. This will improve inference time and make the service a lot faster. CodeGenX will be temporarily inactive from the 28th of March 2022 for about one week. The code generation will not work and new users won't be able to sign up during this period. The new hardware will also allow us to start working on a new and improved version of CodeGenX with more accurate generation capabilities! We apologize for the inconvinience.";
+			if (params.get('loading') === 'true') {
+				return `/* CodeGenX is generating the output */\n`;
+			}
+
+			var word = params.get('word');
+
+			try {
+				word = word.replaceAll(comment_proxy, "#");
+				const payload = { 'input': word, 'max_length': token_max_length, 'temperature': temp, 'token': token };
+				const agent = new https.Agent({  
+					rejectUnauthorized: false
+				  });
+				const result = await axios.post(`https://api.deepgenx.com:5700/generate`, payload, { httpsAgent: agent });
+
+				if (result.data.success) {
+
+					//return getGPTText(Array(result.data.message)) + "\n" + getSOText(word);
+					return getGPTText(Array(result.data.message));
+				} else {
+					// vscode.window.showErrorMessage(result.data.error.message);
+					return result.data.error.message;
+				}
+			} catch (err) {
+				console.log('Error sending request', err);
+				return 'There was an error sending the request\n' + err;
+			}
 		}
 	}();
 	context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(myScheme, textDocumentProvider));

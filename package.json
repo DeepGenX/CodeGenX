@@ -30,7 +30,7 @@
 		"url": "https://github.com/DeepGenX/CodeGenX"
 	},
 	"icon": "assets/logo.ico",
-	"version": "0.1.6",
+	"version": "0.1.7",
 	"engines": {
 		"vscode": "^1.57.0"
 	},
